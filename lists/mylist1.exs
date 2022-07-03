@@ -1,7 +1,6 @@
 defmodule MyList do
-
   def len([]), do: 0
-  def len([ _head | tail ]), do: 1 + len(tail)
+  def len([_head | tail]), do: 1 + len(tail)
 
   @doc """
   -- in haskell
@@ -11,7 +10,7 @@ defmodule MyList do
   """
 
   def add_1([]), do: []
-  def add_1([ head | tail ]), do: [ head+1 | add_1(tail) ]
+  def add_1([head | tail]), do: [head + 1 | add_1(tail)]
 
   @doc """
   -- in haskell
@@ -21,7 +20,7 @@ defmodule MyList do
   """
 
   def map([], _func), do: []
-  def map([ head | tail ], func), do: [ func.(head) | map(tail, func) ]
+  def map([head | tail], func), do: [func.(head) | map(tail, func)]
 
   @doc """
   -- in haskell
@@ -31,7 +30,7 @@ defmodule MyList do
   """
 end
 
-IO.puts MyList.len([11,12,13,14,15])
-IO.inspect MyList.map [1,2,3,4], fn (x) -> x*x end
-IO.inspect MyList.map [1,2,3,4], fn (x) -> x*1 end
-IO.inspect MyList.map [1,2,3,4], fn (x) -> x>2 end
+IO.puts(MyList.len([11, 12, 13, 14, 15]))
+IO.inspect(MyList.map([1, 2, 3, 4], fn x -> x * x end))
+IO.inspect(MyList.map([1, 2, 3, 4], fn x -> x * 1 end))
+IO.inspect(MyList.map([1, 2, 3, 4], fn x -> x > 2 end))

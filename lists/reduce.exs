@@ -1,6 +1,6 @@
 defmodule MyList do
   def reduce([], value, _func), do: value
-  def reduce([ head | tail ], value, func), do: reduce(tail, func.(head, value), func)
+  def reduce([head | tail], value, func), do: reduce(tail, func.(head, value), func)
 
   @doc """
   -- in haskell
@@ -12,5 +12,5 @@ defmodule MyList do
   """
 end
 
-IO.puts MyList.reduce [1,2,3,4,5], 0, fn (x, y) -> x + y end
-IO.puts MyList.reduce([1,2,3,4,5], 1, &(&1 * &2))
+IO.puts(MyList.reduce([1, 2, 3, 4, 5], 0, fn x, y -> x + y end))
+IO.puts(MyList.reduce([1, 2, 3, 4, 5], 1, &(&1 * &2)))
