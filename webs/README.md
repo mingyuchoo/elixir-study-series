@@ -33,6 +33,12 @@ $ mix phx.new <project_name>
 $ cd <project_name>
 ```
 
+## Install dependencies
+
+```bash
+$ mix deps.get
+```
+
 ## Configure database
 
 Configure your database in config/dev.exs and run:
@@ -40,6 +46,13 @@ Configure your database in config/dev.exs and run:
 ```bash
 $ mix ecto.create
 ```
+
+You can drop the database configured:
+
+```bash
+$ mix ecto.drop
+```
+
 
 ## Start application
 
@@ -58,3 +71,4 @@ $ iex -S mix phx.server
 ## References
 
 - <https://hexdocs.pm/phoenix/installation.html>
+- <https://blog.logrocket.com/build-rest-api-elixir-phoenix/>
