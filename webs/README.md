@@ -34,6 +34,12 @@ $ mix phx.new <project_name>
 $ mix phx.new demo --verbose --no-html --no-assets --no-esbuild --no-tailwind --no-dashboard --no-ecto --no-gettext --no-live --no-mailer 
 $ cd <project_name>
 ```
+If you want to create no view, please use:
+
+```bash
+$ mix phx.new <project_name> --no-html --no-assets --binary-id
+$ cd <project_name>
+```
 
 ### Install dependencies
 
