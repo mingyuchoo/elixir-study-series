@@ -30,10 +30,12 @@ $ nix-env -i inotify-tools
 
 ```bash
 $ mix phx.new <project_name>
+# or
+$ mix phx.new demo --verbose --no-html --no-assets --no-esbuild --no-tailwind --no-dashboard --no-ecto --no-gettext --no-live --no-mailer 
 $ cd <project_name>
 ```
 
-## Install dependencies
+### Install dependencies
 
 ```bash
 $ mix deps.get
