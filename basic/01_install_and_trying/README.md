@@ -10,9 +10,6 @@ Enter `iex` in the terminal
 
 ```bash
 $ iex
-Erlang/OTP 25 [erts-13.2.2.7] [source] [64-bit] [smp:12:12] [ds:12:12:10] [async-threads:1] [jit:ns]
-
-Interactive Elixir (1.16.2) - press Ctrl+C to exit (type h() ENTER for help)
 iex(1)>
 ```
 Try out some expressions
@@ -25,3 +22,25 @@ true
 iex> String.length("The quick brown fox jumpbs over the lazy dog")
 43
 ```
+
+### How to compile a file in IEx
+
+```bash
+iex(1)> c "hello.exs"
+Hello, World!
+[]
+```
+
+### How to use IEx.Helpers
+
+```bash
+$ iex
+iex(1)> h
+```
+
+- iex> h(ModuleName)                                     # help message
+- iex> h(ModuleName.FunctionName)                        # help message
+- iex> h(ModuleName.FunctionName/NumberOfArguments)      # help message
+- iex> c(FileName.FileExtension)                         # compile a file
+- iex> i(ValueToIntrospect)                              # introspect
+- iex> exports(ModuleName)                               # export module
