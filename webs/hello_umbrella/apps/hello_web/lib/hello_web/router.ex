@@ -7,5 +7,6 @@ defmodule HelloWeb.Router do
 
   scope "/api", HelloWeb do
     pipe_through :api
+    get "/health-check", HealthCheckController, :index
   end
 end
