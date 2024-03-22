@@ -16,6 +16,9 @@ $ mix archive.install hex phx_new
 
 ## Install PostgreSQL
 
+Please use  https://github.com/mingyuchoo/docker-composes/tree/main/postgresql
+
+
 ## Install Inotify-tools
 
 As you change your views or your assets, it automatically reloads the page in the browser.
@@ -28,16 +31,24 @@ $ nix-env -i inotify-tools
 
 ## Create new Phoenix project
 
-```bash
-$ mix phx.new <project_name>
-# or
-$ mix phx.new demo --verbose --no-html --no-assets --no-esbuild --no-tailwind --no-dashboard --no-ecto --no-gettext --no-live --no-mailer 
-$ cd <project_name>
-```
-If you want to create no view, please use:
+Create full featured project
 
 ```bash
-$ mix phx.new <project_name> --no-html --no-assets --binary-id
+$ mix phx.new <project_name>
+$ cd <project_name>
+```
+
+Create umbrella project
+
+```bash
+$ mix phx.new <project_name> --umbrella
+$ cd <project_name>
+```
+
+Create essential featured project. this would be fit to JSON API server
+
+```bash
+$ mix phx.new <project_name> --umbrella --no-html --no-assets --no-esbuild --no-tailwind --no-dashboard --no-ecto --no-gettext --no-live --no-mailer
 $ cd <project_name>
 ```
 
