@@ -40,5 +40,4 @@ Regex.split(~r/_/, string) |> IO.inspect()
 defmodule MySigils do
   def sigil_x(string, []), do: String.upcase(string)
 end
-
 # ~x/Jose drank Elixir/
