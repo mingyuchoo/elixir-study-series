@@ -1,19 +1,27 @@
 defmodule HelloWeb.HealthCheckController do
   use HelloWeb, :controller
 
-  def index(conn, _params) do
-    HelloApp.HealthCheck.server_healthy?()
-    |> get_server_health
-    |> send_health_response(conn)
+  defmodule HealthResponse do
+    @derive Jason.Encoder
+    defstruct [:status, :timestamp, :version]
   end
 
-  defp get_server_health(true), do: :healthy
-  defp get_server_health(false), do: :unhealthy
+  def index(conn, _params) do
+    HelloApp.HealthCheck.server_healthy?()
+    |> convert_to_status
+    |> send_response(conn)
+  end
 
-  defp send_health_response(status, conn) do
-    json(conn, %{status: status,
-                 timestamp: DateTime.utc_now() |> DateTime.to_iso8601(),
-                 version: Mix.Project.config()[:version]
-                })
+  defp convert_to_status(true), do: :healthy
+  defp convert_to_status(false), do: :unhealthy
+
+  defp send_response(status, conn) do
+    health_response = %HealthResponse{
+      status: status,
+      timestamp: DateTime.utc_now() |> DateTime.to_iso8601(),
+      version: Mix.Project.config()[:version] || "unknown"
+    }
+
+    json(conn, health_response)
   end
 end
