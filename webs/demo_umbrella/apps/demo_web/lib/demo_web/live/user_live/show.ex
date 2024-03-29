@@ -16,6 +16,16 @@ defmodule DemoWeb.UserLive.Show do
      |> assign(:user, Accounts.get_user!(id))}
   end
 
+  @impl true
+  def handle_event("delete", %{"id" => id}, socket) do
+    user = Accounts.get_user!(id)
+    {:ok, _} = Accounts.delete_user(user)
+
+    # 수정
+    # {:noreply, stream_delete(socket, :users, user)}
+    {:noreply, push_navigate(socket, to: "/users")}
+  end
+
   defp page_title(:show), do: "Show User"
   defp page_title(:edit), do: "Edit User"
 end

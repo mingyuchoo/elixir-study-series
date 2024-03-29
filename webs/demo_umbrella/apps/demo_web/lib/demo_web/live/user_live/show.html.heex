@@ -5,6 +5,9 @@
     <.link patch={~p"/users/#{@user}/show/edit"} phx-click={JS.push_focus()}>
       <.button>Edit user</.button>
     </.link>
+    <.link phx-click={JS.push("delete", value: %{id: @user.id})} data-confirm="Are you sure?">
+      <.button>Delete user</.button>
+    </.link>
   </:actions>
 </.header>
 
