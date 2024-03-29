@@ -22,7 +22,6 @@ defmodule DemoWeb.UserLive.Show do
     {:ok, _} = Accounts.delete_user(user)
 
     # 수정
-    # {:noreply, stream_delete(socket, :users, user)}
     {:noreply, push_navigate(socket, to: "/users")}
   end
 
