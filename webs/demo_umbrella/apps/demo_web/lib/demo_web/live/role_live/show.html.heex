@@ -5,6 +5,10 @@
     <.link patch={~p"/roles/#{@role}/show/edit"} phx-click={JS.push_focus()}>
       <.button>Edit role</.button>
     </.link>
+    <!-- 추가 -->
+    <.link phx-click={JS.push("delete", value: %{id: @role.id})} data-confirm="Are you sure?">
+      <.button>Delte role</.button>
+    </.link>
   </:actions>
 </.header>
 
