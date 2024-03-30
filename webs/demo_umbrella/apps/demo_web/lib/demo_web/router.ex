@@ -18,6 +18,9 @@ defmodule DemoWeb.Router do
     pipe_through :browser
 
     # 추가
+    live "/", HomeLive.Index, :index
+
+    # 추가
     live "/users", UserLive.Index, :index
     live "/users/new", UserLive.Index, :new
     live "/users/:id/edit", UserLive.Index, :edit

@@ -83,6 +83,10 @@ defmodule DemoWeb.UserLive.FormComponent do
       {:ok, user} ->
         notify_parent({:saved, user})
 
+        # 추가
+        role = Accounts.get_role!(user.role_id)
+        Accounts.update_role(role, %{user_count: role.user_count + 1})
+
         {:noreply,
          socket
          |> put_flash(:info, "User created successfully")

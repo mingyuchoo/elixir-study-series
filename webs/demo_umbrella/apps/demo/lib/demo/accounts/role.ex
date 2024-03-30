@@ -7,7 +7,8 @@ defmodule Demo.Accounts.Role do
   schema "roles" do
     field :name, :string
     field :description, :string
-
+    field :user_count, :integer
+    
     # 추가
     has_many :users, User
 
@@ -17,7 +18,7 @@ defmodule Demo.Accounts.Role do
   @doc false
   def changeset(role, attrs) do
     role
-    |> cast(attrs, [:name, :description])
-    |> validate_required([:name, :description])
+    |> cast(attrs, [:name, :description, :user_count])
+    |> validate_required([:name, :description, :user_count])
   end
 end
