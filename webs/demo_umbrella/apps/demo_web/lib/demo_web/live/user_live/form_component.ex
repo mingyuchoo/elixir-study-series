@@ -2,6 +2,7 @@ defmodule DemoWeb.UserLive.FormComponent do
   use DemoWeb, :live_component
 
   alias Demo.Accounts
+  alias Demo.Accounts.User
 
   @impl true
   def render(assigns) do
@@ -19,10 +20,9 @@ defmodule DemoWeb.UserLive.FormComponent do
         phx-change="validate"
         phx-submit="save"
       >
-        <.input field={@form[:name]} type="text" label="Name" />
-        <.input field={@form[:age]} type="number" label="Age" />
         <.input field={@form[:email]} type="text" label="Email" />
-        <.input field={@form[:address]} type="text" label="Address" />
+        <.input field={@form[:password]} type="password" label="Password" />
+        <.input field={@form[:nickname]} type="text" label="Nickname" />
         <!-- 추가 -->
         <.input
           field={@form[:role_id]}
@@ -49,19 +49,45 @@ defmodule DemoWeb.UserLive.FormComponent do
      |> assign_form(changeset)}
   end
 
-  @impl true
+  # @impl true
+  # def handle_event("validate", %{"user" => user_params}, socket) do
+  #   changeset =
+  #     socket.assigns.user
+  #     |> Accounts.change_user(user_params)
+  #     |> Map.put(:action, :validate)
+  #
+  #   {:noreply, assign_form(socket, changeset)}
+  # end
   def handle_event("validate", %{"user" => user_params}, socket) do
-    changeset =
-      socket.assigns.user
-      |> Accounts.change_user(user_params)
-      |> Map.put(:action, :validate)
-
-    {:noreply, assign_form(socket, changeset)}
+    changeset = Accounts.change_user_registration(%User{}, user_params)
+    {:noreply, assign_form(socket, Map.put(changeset, :action, :validate))}
   end
 
   def handle_event("save", %{"user" => user_params}, socket) do
     save_user(socket, socket.assigns.action, user_params)
   end
+
+  # def handle_event("save", %{"user" => user_params}, socket) do
+  #   case Accounts.create_user(user_params) do
+  #     {:ok, user} ->
+  #       notify_parent({:saved, user})
+  #
+  #       {:ok, _} =
+  #         Accounts.deliver_user_confirmation_instructions(user, &url(~p"/users/confirm/#{&1}"))
+  #
+  #       changeset = Accounts.change_user_registration(user)
+  #
+  #       # {:noreply, socket |> assign(trigger_submit: true) |> assign_form(changeset)}
+  #       {:noreply,
+  #        socket
+  #        |> assign(trigger_submit: true)
+  #        |> put_flash(:info, "User created successfully")
+  #        |> push_patch(to: socket.assigns.patch)}
+  #
+  #     {:error, %Ecto.Changeset{} = changeset} ->
+  #       {:noreply, socket |> assign(check_errors: true) |> assign_form(changeset)}
+  #   end
+  # end
 
   defp save_user(socket, :edit, user_params) do
     case Accounts.update_user(socket.assigns.user, user_params) do
@@ -79,21 +105,43 @@ defmodule DemoWeb.UserLive.FormComponent do
   end
 
   defp save_user(socket, :new, user_params) do
+    # case Accounts.create_user(user_params) do
+    #   {:ok, user} ->
+    #     notify_parent({:saved, user})
+    #
+    #     # 추가
+    #     role = Accounts.get_role!(user.role_id)
+    #     Accounts.update_role(role, %{user_count: role.user_count + 1})
+    #
+    #     {:noreply,
+    #      socket
+    #      |> put_flash(:info, "User created successfully")
+    #      |> push_patch(to: socket.assigns.patch)}
+    #
+    #   {:error, %Ecto.Changeset{} = changeset} ->
+    #     {:noreply, assign_form(socket, changeset)}
+    # end
     case Accounts.create_user(user_params) do
       {:ok, user} ->
-        notify_parent({:saved, user})
+        changeset = Accounts.change_user_registration(user)
 
         # 추가
         role = Accounts.get_role!(user.role_id)
         Accounts.update_role(role, %{user_count: role.user_count + 1})
 
+        {:ok, _} =
+          Accounts.deliver_user_confirmation_instructions(user, &url(~p"/users/confirm/#{&1}"))
+
+        notify_parent({:saved, user})
+
         {:noreply,
          socket
+         |> assign(trigger_submit: true)
          |> put_flash(:info, "User created successfully")
          |> push_patch(to: socket.assigns.patch)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign_form(socket, changeset)}
+        {:noreply, socket |> assign(check_errors: true) |> assign_form(changeset)}
     end
   end
 

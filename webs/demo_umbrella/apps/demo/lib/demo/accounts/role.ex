@@ -19,6 +19,6 @@ defmodule Demo.Accounts.Role do
   def changeset(role, attrs) do
     role
     |> cast(attrs, [:name, :description, :user_count])
-    |> validate_required([:name, :description, :user_count])
+    |> validate_required([:name, :description])
   end
 end

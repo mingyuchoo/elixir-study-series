@@ -13,10 +13,8 @@
 </.header>
 
 <.list>
-  <:item title="Name"><%= @user.name %></:item>
-  <:item title="Age"><%= @user.age %></:item>
   <:item title="Email"><%= @user.email %></:item>
-  <:item title="Address"><%= @user.address %></:item>
+  <:item title="Nickname"><%= @user.nickname || Phoenix.HTML.raw("<em>no nickname</em>") %></:item>
   <!-- 추가 -->
   <:item title="Role"><%= @user.role.name %></:item>
 </.list>
