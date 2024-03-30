@@ -49,45 +49,16 @@ defmodule DemoWeb.UserLive.FormComponent do
      |> assign_form(changeset)}
   end
 
-  # @impl true
-  # def handle_event("validate", %{"user" => user_params}, socket) do
-  #   changeset =
-  #     socket.assigns.user
-  #     |> Accounts.change_user(user_params)
-  #     |> Map.put(:action, :validate)
-  #
-  #   {:noreply, assign_form(socket, changeset)}
-  # end
+  @impl true
   def handle_event("validate", %{"user" => user_params}, socket) do
     changeset = Accounts.change_user_registration(%User{}, user_params)
     {:noreply, assign_form(socket, Map.put(changeset, :action, :validate))}
   end
 
+  @impl true
   def handle_event("save", %{"user" => user_params}, socket) do
     save_user(socket, socket.assigns.action, user_params)
   end
-
-  # def handle_event("save", %{"user" => user_params}, socket) do
-  #   case Accounts.create_user(user_params) do
-  #     {:ok, user} ->
-  #       notify_parent({:saved, user})
-  #
-  #       {:ok, _} =
-  #         Accounts.deliver_user_confirmation_instructions(user, &url(~p"/users/confirm/#{&1}"))
-  #
-  #       changeset = Accounts.change_user_registration(user)
-  #
-  #       # {:noreply, socket |> assign(trigger_submit: true) |> assign_form(changeset)}
-  #       {:noreply,
-  #        socket
-  #        |> assign(trigger_submit: true)
-  #        |> put_flash(:info, "User created successfully")
-  #        |> push_patch(to: socket.assigns.patch)}
-  #
-  #     {:error, %Ecto.Changeset{} = changeset} ->
-  #       {:noreply, socket |> assign(check_errors: true) |> assign_form(changeset)}
-  #   end
-  # end
 
   defp save_user(socket, :edit, user_params) do
     case Accounts.update_user(socket.assigns.user, user_params) do
@@ -105,25 +76,9 @@ defmodule DemoWeb.UserLive.FormComponent do
   end
 
   defp save_user(socket, :new, user_params) do
-    # case Accounts.create_user(user_params) do
-    #   {:ok, user} ->
-    #     notify_parent({:saved, user})
-    #
-    #     # 추가
-    #     role = Accounts.get_role!(user.role_id)
-    #     Accounts.update_role(role, %{user_count: role.user_count + 1})
-    #
-    #     {:noreply,
-    #      socket
-    #      |> put_flash(:info, "User created successfully")
-    #      |> push_patch(to: socket.assigns.patch)}
-    #
-    #   {:error, %Ecto.Changeset{} = changeset} ->
-    #     {:noreply, assign_form(socket, changeset)}
-    # end
     case Accounts.create_user(user_params) do
       {:ok, user} ->
-        changeset = Accounts.change_user_registration(user)
+        notify_parent({:saved, user})
 
         # 추가
         role = Accounts.get_role!(user.role_id)
@@ -132,7 +87,7 @@ defmodule DemoWeb.UserLive.FormComponent do
         {:ok, _} =
           Accounts.deliver_user_confirmation_instructions(user, &url(~p"/users/confirm/#{&1}"))
 
-        notify_parent({:saved, user})
+        # changeset = Accounts.change_user_registration(user)
 
         {:noreply,
          socket
