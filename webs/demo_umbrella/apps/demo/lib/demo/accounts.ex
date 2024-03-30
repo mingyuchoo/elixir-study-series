@@ -12,7 +12,9 @@ defmodule Demo.Accounts do
   
   def list_users do
     # 추가
-    Repo.all(User) |> Repo.preload([:role])
+    from(u in User, order_by: [asc: u.id])
+    |> Repo.all()
+    |> Repo.preload([:role])
   end
 
   def get_user!(id) do
@@ -222,7 +224,8 @@ defmodule Demo.Accounts do
 
   """
   def list_roles do
-    Repo.all(Role)
+    from(r in Role, order_by: [asc: r.id])
+    |> Repo.all()
   end
 
   @doc """
