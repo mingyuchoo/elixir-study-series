@@ -1,5 +1,8 @@
 import Config
 
+# Only in tests, remove the complexity from the password hashing algorithm
+config :bcrypt_elixir, :log_rounds, 1
+
 # Configure your database
 #
 # The MIX_TEST_PARTITION environment variable can be used
@@ -17,7 +20,7 @@ config :demo, Demo.Repo,
 # you can enable the server option below.
 config :demo_web, DemoWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
-  secret_key_base: "syAkxYazNg8mGjwrtwfQtWl2bPw7/W6Ld7xvyLb3WMZ0f8XGzSIKQ9XMgIQc4GuV",
+  secret_key_base: "KzGHQU/qCUMe7RitH7NClXdBNC5Cay4y76Gk9CBMXZIba3Y+bfxYqFM4gA9CsPtT",
   server: false
 
 # Print only warnings and errors during test

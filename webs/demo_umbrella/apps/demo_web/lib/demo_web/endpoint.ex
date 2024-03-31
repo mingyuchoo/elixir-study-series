@@ -7,7 +7,7 @@ defmodule DemoWeb.Endpoint do
   @session_options [
     store: :cookie,
     key: "_demo_web_key",
-    signing_salt: "9Stkp4bS",
+    signing_salt: "Qd7uzQ3m",
     same_site: "Lax"
   ]
 

@@ -2,7 +2,7 @@
   User <%= @user.id %>
   <:subtitle>This is a user record from your database.</:subtitle>
   <:actions>
-    <.link patch={~p"/users/#{@user}/show/edit"} phx-click={JS.push_focus()}>
+    <.link patch={~p"/admin/users/#{@user}/show/edit"} phx-click={JS.push_focus()}>
       <.button>Edit user</.button>
     </.link>
     <!-- 추가 -->
@@ -15,19 +15,17 @@
 <.list>
   <:item title="Email"><%= @user.email %></:item>
   <:item title="Nickname"><%= @user.nickname || Phoenix.HTML.raw("<em>no nickname</em>") %></:item>
-  <!-- 추가 -->
-  <:item title="Role"><%= @user.role.name %></:item>
 </.list>
 
-<.back navigate={~p"/users"}>Back to users</.back>
+<.back navigate={~p"/admin/users"}>Back to users</.back>
 
-<.modal :if={@live_action == :edit} id="user-modal" show on_cancel={JS.patch(~p"/users/#{@user}")}>
+<.modal :if={@live_action == :edit} id="user-modal" show on_cancel={JS.patch(~p"/admin/users/#{@user}")}>
   <.live_component
     module={DemoWeb.UserLive.FormComponent}
     id={@user.id}
     title={@page_title}
     action={@live_action}
     user={@user}
-    patch={~p"/users/#{@user}"}
+    patch={~p"/admin/users/#{@user}"}
   />
 </.modal>

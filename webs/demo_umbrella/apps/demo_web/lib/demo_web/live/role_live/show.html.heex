@@ -2,7 +2,7 @@
   Role <%= @role.id %>
   <:subtitle>This is a role record from your database.</:subtitle>
   <:actions>
-    <.link patch={~p"/roles/#{@role}/show/edit"} phx-click={JS.push_focus()}>
+    <.link patch={~p"/admin/roles/#{@role}/show/edit"} phx-click={JS.push_focus()}>
       <.button>Edit role</.button>
     </.link>
     <!-- 추가 -->
@@ -18,15 +18,15 @@
   <:item title="User Count"><%= @role.user_count %></:item>
 </.list>
 
-<.back navigate={~p"/roles"}>Back to roles</.back>
+<.back navigate={~p"/admin/roles"}>Back to roles</.back>
 
-<.modal :if={@live_action == :edit} id="role-modal" show on_cancel={JS.patch(~p"/roles/#{@role}")}>
+<.modal :if={@live_action == :edit} id="role-modal" show on_cancel={JS.patch(~p"/admin/roles/#{@role}")}>
   <.live_component
     module={DemoWeb.RoleLive.FormComponent}
     id={@role.id}
     title={@page_title}
     action={@live_action}
     role={@role}
-    patch={~p"/roles/#{@role}"}
+    patch={~p"/admin/roles/#{@role}"}
   />
 </.modal>
