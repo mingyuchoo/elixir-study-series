@@ -2,17 +2,16 @@ defmodule Demo.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias Demo.Accounts.{Role, RoleUser}
+
   schema "users" do
     field :email, :string
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
     field :nickname, :string
-
-    # 추가
-    belongs_to :role, Role
-
-    timestamps()
+    many_to_many :roles, Role, join_through: RoleUser, on_replace: :delete
+    timestamps(type: :utc_datetime)
   end
 
   @doc """
@@ -41,6 +40,7 @@ defmodule Demo.Accounts.User do
   def registration_changeset(user, attrs, opts \\ []) do
     user
     |> cast(attrs, [:email, :password])
+    |> cast_assoc(:roles, required: true)
     |> validate_email(opts)
     |> validate_password(opts)
   end

@@ -9,8 +9,6 @@ defmodule Demo.Repo.Migrations.CreateUsersAuthTables do
       add :hashed_password, :string, null: false
       add :confirmed_at, :naive_datetime
       add :nickname, :string
-      add :role_id, references(:roles, on_delete: :nilify_all)
-
       timestamps()
     end
 
