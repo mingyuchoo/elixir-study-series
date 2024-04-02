@@ -12,4 +12,9 @@
 
 alias Demo.Repo
 alias Demo.Accounts.{Role}
-Repo.insert!(%Role{name: "Guest", description: "Geust"})
+Repo.insert!(%Role{name: "Appr", description: "Apprentice"})
+Repo.insert!(%Role{name: "Dev", description: "Developer"})
+Repo.insert!(%Role{name: "Op", description: "Operator"})
+Repo.insert!(%Role{name: "QA", description: "Quality Assurance"})
+Repo.insert!(%Role{name: "Aud", description: "Aduditor"})
+Repo.insert!(%Role{name: "Admin", description: "Administrator"})
