@@ -20,7 +20,12 @@
 
 <.back navigate={~p"/admin/roles"}>Back to roles</.back>
 
-<.modal :if={@live_action == :edit} id="role-modal" show on_cancel={JS.patch(~p"/admin/roles/#{@role}")}>
+<.modal
+  :if={@live_action == :edit}
+  id="role-modal"
+  show
+  on_cancel={JS.patch(~p"/admin/roles/#{@role}")}
+>
   <.live_component
     module={DemoWeb.RoleLive.FormComponent}
     id={@role.id}

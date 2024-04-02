@@ -60,7 +60,12 @@ defmodule Demo.Accounts do
       ** (Ecto.NoResultsError)
 
   """
-  def get_user!(id), do: Repo.get!(User, id)
+  def get_user!(id) do
+    # NOTE:
+    # 연관 데이터가 있어 preload 함
+    Repo.get!(User, id)
+    |> Repo.preload(:roles)
+  end
 
   ## User registration
 
@@ -77,6 +82,8 @@ defmodule Demo.Accounts do
 
   """
   def register_user(attrs) do
+    # NOTE:
+    # 연관 데이터가 있어 preload 함
     %User{}
     |> Repo.preload(:roles)
     |> User.registration_changeset(attrs)
@@ -353,9 +360,12 @@ defmodule Demo.Accounts do
       {:error, :user, changeset, _} -> {:error, changeset}
     end
   end
+
   # ---------------------------------------------------------------------------
 
   def list_users do
+    # NOTE:
+    # 연관 데이터가 있어 preload 함
     from(u in User, order_by: [asc: u.id])
     |> Repo.all()
     |> Repo.preload(:roles)
@@ -366,12 +376,13 @@ defmodule Demo.Accounts do
     |> User.registration_changeset(attrs)
     |> Repo.insert()
     |> case do
-         {:ok, user} ->
-           user = Repo.preload(user, :roles)
-           {:ok, user}
-         {:error, changeset} ->
-           {:error, changeset}
-         end
+      {:ok, user} ->
+        user = Repo.preload(user, :roles)
+        {:ok, user}
+
+      {:error, changeset} ->
+        {:error, changeset}
+    end
   end
 
   def update_user(%User{} = user, attrs) do
@@ -379,15 +390,14 @@ defmodule Demo.Accounts do
     |> User.registration_changeset(attrs)
     |> Repo.update()
     |> case do
-         {:ok, user} ->
-           user = Repo.preload(user, :roles)
-           {:ok, user}
-         {:error, changeset} ->
-           {:error, changeset}
-         end
+      {:ok, user} ->
+        user = Repo.preload(user, :roles)
+        {:ok, user}
 
+      {:error, changeset} ->
+        {:error, changeset}
+    end
   end
-
 
   def delete_user(%User{} = user) do
     Repo.delete(user)
@@ -411,8 +421,11 @@ defmodule Demo.Accounts do
 
   """
   def list_roles do
+    # NOTE:
+    # 연관 데이터가 있어 preload 함
     from(r in Role, order_by: [asc: r.id])
     |> Repo.all()
+    |> Repo.preload(:users)
   end
 
   @doc """
@@ -429,7 +442,12 @@ defmodule Demo.Accounts do
       ** (Ecto.NoResultsError)
 
   """
-  def get_role!(id), do: Repo.get!(Role, id)
+  def get_role!(id) do
+    # NOTE:
+    # 연관 데이터가 있어 preload 함
+    Repo.get!(Role, id)
+    |> Repo.preload(:users)
+  end
 
   @doc """
   Creates a role.

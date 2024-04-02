@@ -20,9 +20,9 @@ defmodule DemoWeb.UserLive.FormComponent do
         phx-change="validate"
         phx-submit="save"
       >
-        <.input field={@form[:email]} type="text" label="Email" />
-        <.input field={@form[:password]} type="password" label="Password" />
-        <.input field={@form[:nickname]} type="text" label="Nickname" />
+        <.input field={@form[:email]} type="text" label="Email" placeholder="Your email" />
+        <.input field={@form[:password]} type="password" label="Password" placeholder="Your password" />
+        <.input field={@form[:nickname]} type="text" label="Nickname" placeholder="Your nickname" />
         <!-- 추가 -->
         <.input
           field={@form[:role_id]}
@@ -80,9 +80,11 @@ defmodule DemoWeb.UserLive.FormComponent do
       {:ok, user} ->
         notify_parent({:saved, user})
 
-        # 추가
-        # role = Accounts.get_role!(user.role_id)
-        # Accounts.update_role(role, %{user_count: role.user_count + 1})
+        # NOTE:
+        # User가 추가될 때 Role에 user_count 1 가산
+        Enum.map(user.roles, fn role ->
+          Accounts.update_role(role, %{user_count: role.user_count + 1})
+        end)
 
         {:ok, _} =
           Accounts.deliver_user_confirmation_instructions(
@@ -102,7 +104,8 @@ defmodule DemoWeb.UserLive.FormComponent do
   end
 
   defp assign_form(socket, %Ecto.Changeset{} = changeset) do
-    # 추가
+    # NOTE:
+    # 폼을 만들 때 :roles 데이터 가져오기
     socket
     |> assign(:form, to_form(changeset))
     |> assign(:roles, Accounts.list_roles())

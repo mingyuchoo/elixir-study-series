@@ -9,3 +9,7 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
+
+alias Demo.Repo
+alias Demo.Accounts.{Role}
+Repo.insert!(%Role{name: "Guest", description: "Geust"})

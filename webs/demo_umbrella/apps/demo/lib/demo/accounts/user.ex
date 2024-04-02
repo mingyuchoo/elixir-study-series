@@ -50,20 +50,28 @@ defmodule Demo.Accounts.User do
     |> cast(attrs, [:email, :password])
     |> validate_email(opts)
     |> validate_password(opts)
+    # NOTE:
+    # :roles가 many_to_many 관계로 정의되어 있으면
+    # put_assoc/3를 사용할 수 없고
+    # 직접구현해서 사용해야 함
     |> associate_roles(attrs)
   end
 
-  
   defp associate_roles(changeset, attrs) do
     case attrs["role_id"] do
       role_id when role_id == nil or role_id == "" ->
-        add_error(changeset, :roles, "At least one role must be selected")
+        # NOTE:
+        # :roles 대신에 role_id를 사용해야 함
+        # :roles 필드는 실제로 데이터베이스에 존재하지 않는 가상의 필드고,
+        # 사용자가 직접 상호작용하는 필드는 :role_id이기 때문
+        add_error(changeset, :role_id, "must be selected")
+
       role_id ->
         role = Accounts.get_role!(role_id)
         put_assoc(changeset, :roles, [role])
     end
-end
-  
+  end
+
   defp validate_email(changeset, opts) do
     changeset
     |> validate_required([:email])

@@ -42,13 +42,14 @@ defmodule DemoWeb.UserLive.Index do
     user = Accounts.get_user!(id)
     {:ok, _} = Accounts.delete_user(user)
 
-    #  # 추가
-    #  role = Accounts.get_role!(user.role_id)
-    #  # 추가
-    #  case role.user_count > 0 do
-    #    true -> Accounts.update_role(role, %{user_count: role.user_count - 1})
-    #    false -> Accounts.update_role(role, %{user_count: 0})
-    #  end
+    # NOTE:
+    # User가 삭제될 때 Role에 user_count 1 차감
+    Enum.map(user.roles, fn role ->
+      case role.user_count > 0 do
+        true -> Accounts.update_role(role, %{user_count: role.user_count - 1})
+        false -> Accounts.update_role(role, %{user_count: 0})
+      end
+    end)
 
     {:noreply, stream_delete(socket, :users, user)}
   end

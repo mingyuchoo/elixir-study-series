@@ -1,4 +1,4 @@
-all: clean drop create migrate run
+all: clean drop create migrate seed run
 
 clean:
 	mix clean
@@ -8,5 +8,7 @@ create:
 	mix ecto.create
 migrate:
 	mix ecto.migrate
+seed:
+	mix run apps/demo/priv/repo/seeds.exs
 run:
 	iex -S mix phx.server

@@ -31,7 +31,12 @@
   </:action>
 </.table>
 
-<.modal :if={@live_action in [:new, :edit]} id="role-modal" show on_cancel={JS.patch(~p"/admin/roles")}>
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="role-modal"
+  show
+  on_cancel={JS.patch(~p"/admin/roles")}
+>
   <.live_component
     module={DemoWeb.RoleLive.FormComponent}
     id={@role.id || :new}

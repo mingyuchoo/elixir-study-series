@@ -35,7 +35,6 @@ defmodule DemoWeb.Router do
     live "/admin/users/:id/edit", UserLive.Index, :edit
     live "/admin/users/:id", UserLive.Show, :show
     live "/admin/users/:id/show/edit", UserLive.Show, :edit
-
   end
 
   # Other scopes may use custom stacks.
