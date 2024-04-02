@@ -449,6 +449,11 @@ defmodule Demo.Accounts do
     |> Repo.preload(:users)
   end
 
+  def get_default_role(role_name) do
+    Repo.get_by!(Role, name: role_name)
+    |> Repo.preload(:users)
+  end
+
   @doc """
   Creates a role.
 

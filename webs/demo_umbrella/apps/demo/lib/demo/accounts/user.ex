@@ -60,11 +60,16 @@ defmodule Demo.Accounts.User do
   defp associate_roles(changeset, attrs) do
     case attrs["role_id"] do
       role_id when role_id == nil or role_id == "" ->
+        ## NOTE:
+        ## :roles 대신에 role_id를 사용해야 함
+        ## :roles 필드는 실제로 데이터베이스에 존재하지 않는 가상의 필드고,
+        ## 사용자가 직접 상호작용하는 필드는 :role_id이기 때문
+        # add_error(changeset, :role_id, "must be selected")
+
         # NOTE:
-        # :roles 대신에 role_id를 사용해야 함
-        # :roles 필드는 실제로 데이터베이스에 존재하지 않는 가상의 필드고,
-        # 사용자가 직접 상호작용하는 필드는 :role_id이기 때문
-        add_error(changeset, :role_id, "must be selected")
+        # 등록 아무것도 선택하지 않았을 때는 기본 역할을 배정함
+        role = Accounts.get_default_role("Appr")
+        put_assoc(changeset, :roles, [role])
 
       role_id ->
         role = Accounts.get_role!(role_id)

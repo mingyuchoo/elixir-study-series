@@ -57,10 +57,13 @@ defmodule DemoWeb.UserLive.Registration do
     case Accounts.register_user(user_params) do
       {:ok, user} ->
         {:ok, _} =
-          Accounts.deliver_user_confirmation_instructions(
-            user,
-            &url(~p"/users/confirm/#{&1}")
-          )
+          Accounts.deliver_user_confirmation_instructions(user, &url(~p"/users/confirm/#{&1}"))
+
+        # NOTE:
+        # User가 추가될 때 Role에 user_count 1 가산
+        Enum.map(user.roles, fn role ->
+          Accounts.update_role(role, %{user_count: role.user_count + 1})
+        end)
 
         changeset = Accounts.change_user_registration(user)
         {:noreply, socket |> assign(trigger_submit: true) |> assign_form(changeset)}
