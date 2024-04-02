@@ -7,7 +7,7 @@ defmodule Demo.Accounts.Role do
   schema "roles" do
     field :name, :string
     field :description, :string
-    field :user_count, :integer
+    field :user_count, :integer, default: 0
     many_to_many :users, User, join_through: RoleUser, on_replace: :delete
     timestamps(type: :utc_datetime)
   end
@@ -16,7 +16,6 @@ defmodule Demo.Accounts.Role do
   def changeset(role, attrs) do
     role
     |> cast(attrs, [:name, :description, :user_count])
-    |> cast_assoc(:users, required: true)
     |> validate_required([:name, :description])
   end
 end

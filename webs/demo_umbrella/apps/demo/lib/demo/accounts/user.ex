@@ -2,6 +2,7 @@ defmodule Demo.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias Demo.Accounts
   alias Demo.Accounts.{Role, RoleUser}
 
   schema "users" do
@@ -13,6 +14,13 @@ defmodule Demo.Accounts.User do
     many_to_many :roles, Role, join_through: RoleUser, on_replace: :delete
     timestamps(type: :utc_datetime)
   end
+
+  # @doc false
+  # def changeset(user, attrs) do
+  #   user
+  #   |> cast(attrs, [:email, :password])
+  #   |> validate_required([:email, :password])
+  # end
 
   @doc """
   A user changeset for registration.
@@ -40,11 +48,22 @@ defmodule Demo.Accounts.User do
   def registration_changeset(user, attrs, opts \\ []) do
     user
     |> cast(attrs, [:email, :password])
-    |> cast_assoc(:roles, required: true)
     |> validate_email(opts)
     |> validate_password(opts)
+    |> associate_roles(attrs)
   end
 
+  
+  defp associate_roles(changeset, attrs) do
+    case attrs["role_id"] do
+      role_id when role_id == nil or role_id == "" ->
+        add_error(changeset, :roles, "At least one role must be selected")
+      role_id ->
+        role = Accounts.get_role!(role_id)
+        put_assoc(changeset, :roles, [role])
+    end
+end
+  
   defp validate_email(changeset, opts) do
     changeset
     |> validate_required([:email])

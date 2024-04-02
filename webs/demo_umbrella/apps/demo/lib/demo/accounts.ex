@@ -78,6 +78,7 @@ defmodule Demo.Accounts do
   """
   def register_user(attrs) do
     %User{}
+    |> Repo.preload(:roles)
     |> User.registration_changeset(attrs)
     |> Repo.insert()
   end
@@ -355,19 +356,18 @@ defmodule Demo.Accounts do
   # ---------------------------------------------------------------------------
 
   def list_users do
-    # 추가
     from(u in User, order_by: [asc: u.id])
     |> Repo.all()
-    |> Repo.preload([:role])
+    |> Repo.preload(:roles)
   end
 
-    def create_user(attrs \\ %{}) do
+  def create_user(attrs \\ %{}) do
     %User{}
     |> User.registration_changeset(attrs)
     |> Repo.insert()
-    |> case do # 추가
+    |> case do
          {:ok, user} ->
-           user = Repo.preload(user, :role)
+           user = Repo.preload(user, :roles)
            {:ok, user}
          {:error, changeset} ->
            {:error, changeset}
@@ -378,9 +378,9 @@ defmodule Demo.Accounts do
     user
     |> User.registration_changeset(attrs)
     |> Repo.update()
-    |> case do # 추가
+    |> case do
          {:ok, user} ->
-           user = Repo.preload(user, :role)
+           user = Repo.preload(user, :roles)
            {:ok, user}
          {:error, changeset} ->
            {:error, changeset}

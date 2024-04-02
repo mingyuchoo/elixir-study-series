@@ -81,13 +81,14 @@ defmodule DemoWeb.UserLive.FormComponent do
         notify_parent({:saved, user})
 
         # 추가
-        role = Accounts.get_role!(user.role_id)
-        Accounts.update_role(role, %{user_count: role.user_count + 1})
+        # role = Accounts.get_role!(user.role_id)
+        # Accounts.update_role(role, %{user_count: role.user_count + 1})
 
         {:ok, _} =
-          Accounts.deliver_user_confirmation_instructions(user, &url(~p"/admin/users/confirm/#{&1}"))
-
-        # changeset = Accounts.change_user_registration(user)
+          Accounts.deliver_user_confirmation_instructions(
+            user,
+            &url(~p"/admin/users/confirm/#{&1}")
+          )
 
         {:noreply,
          socket
