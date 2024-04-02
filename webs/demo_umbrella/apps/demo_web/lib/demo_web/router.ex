@@ -21,20 +21,6 @@ defmodule DemoWeb.Router do
     pipe_through :browser
 
     get "/", HomeController, :index
-
-    # 추가
-    live "/admin/roles", RoleLive.Index, :index
-    live "/admin/roles/new", RoleLive.Index, :new
-    live "/admin/roles/:id/edit", RoleLive.Index, :edit
-    live "/admin/roles/:id", RoleLive.Show, :show
-    live "/admin/roles/:id/show/edit", RoleLive.Show, :edit
-
-    # 추가
-    live "/admin/users", UserLive.Index, :index
-    live "/admin/users/new", UserLive.Index, :new
-    live "/admin/users/:id/edit", UserLive.Index, :edit
-    live "/admin/users/:id", UserLive.Show, :show
-    live "/admin/users/:id/show/edit", UserLive.Show, :edit
   end
 
   # Other scopes may use custom stacks.
@@ -82,6 +68,18 @@ defmodule DemoWeb.Router do
       on_mount: [{DemoWeb.UserAuth, :ensure_authenticated}] do
       live "/users/settings", UserLive.Settings, :edit
       live "/users/settings/confirm_email/:token", UserLive.Settings, :confirm_email
+
+      live "/admin/roles", RoleLive.Index, :index
+      live "/admin/roles/new", RoleLive.Index, :new
+      live "/admin/roles/:id/edit", RoleLive.Index, :edit
+      live "/admin/roles/:id", RoleLive.Show, :show
+      live "/admin/roles/:id/show/edit", RoleLive.Show, :edit
+
+      live "/admin/users", UserLive.Index, :index
+      live "/admin/users/new", UserLive.Index, :new
+      live "/admin/users/:id/edit", UserLive.Index, :edit
+      live "/admin/users/:id", UserLive.Show, :show
+      live "/admin/users/:id/show/edit", UserLive.Show, :edit
     end
   end
 

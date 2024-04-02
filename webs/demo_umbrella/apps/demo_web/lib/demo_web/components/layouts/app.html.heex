@@ -1,5 +1,5 @@
 <header class="px-4 sm:px-6 lg:px-8">
-  <div class="flex items-center justify-between border-b border-zinc-100 py-3 text-sm">
+  <div class="flex items-center justify-start border-b border-zinc-100 py-3 text-sm">
     <div class="flex items-center gap-4">
       <a href="/">
         <img src={~p"/images/logo.svg"} width="36" />
@@ -9,14 +9,14 @@
       </p>
     </div>
     <div class="flex items-center gap-4 font-semibold leading-6 text-zinc-900">
-      <a href="/admin/roles" class="hover:text-zinc-700">
-        Roles
+      <a href="/" class="rounded-lg bg-zinc-100 px-2 py-1 hover:bg-zinc-200/80">
+        Home
       </a>
-      <a href="/admin/users" class="hover:text-zinc-700">
+      <a href="/admin/users" class="rounded-lg bg-zinc-100 px-2 py-1 hover:text-zinc-700">
         Users
       </a>
-      <a href="/" class="rounded-lg bg-zinc-100 px-2 py-1 hover:bg-zinc-200/80">
-        Home <span aria-hidden="true">&rarr;</span>
+      <a href="/admin/roles" class="rounded-lg bg-zinc-100 px-2 py-1 hover:text-zinc-700">
+        Roles
       </a>
     </div>
   </div>
