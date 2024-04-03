@@ -19,7 +19,7 @@ defmodule DemoWeb.ListLive.FormComponent do
         phx-change="validate"
         phx-submit="save"
       >
-        <.input field={@form[:title]} type="text" label="Title" />
+        <.input field={@form[:title]} type="text" label="Title" placeholder="New list title"/>
         <:actions>
           <.button phx-disable-with="Saving...">Save List</.button>
         </:actions>

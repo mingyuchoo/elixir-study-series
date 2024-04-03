@@ -71,7 +71,10 @@ defmodule Demo.Accounts do
 
   @doc """
   Registers a user.
-
+  # NOTE:
+  사용자를 생성한 뒤 연관된 데이터를 preload하지 않으면
+  방금 생성한 사용자에 연관된 데이터가 없어
+  목록에 생성한 사용자를 보여주고자 할 때 오류가 발생함
   ## Examples
 
       iex> register_user(%{field: value})
@@ -82,12 +85,14 @@ defmodule Demo.Accounts do
 
   """
   def register_user(attrs) do
-    # NOTE:
-    # 연관 데이터가 있어 preload 함
     %User{}
-    |> Repo.preload(:roles)
     |> User.registration_changeset(attrs)
     |> Repo.insert()
+    # IMPORTANT:
+    |> case do
+      {:ok, user} -> {:ok, Repo.preload(user, :roles)}
+      {:error, changeset} -> {:error, changeset}
+    end
   end
 
   @doc """
@@ -375,13 +380,10 @@ defmodule Demo.Accounts do
     %User{}
     |> User.registration_changeset(attrs)
     |> Repo.insert()
+    # IMPORTANT:
     |> case do
-      {:ok, user} ->
-        user = Repo.preload(user, :roles)
-        {:ok, user}
-
-      {:error, changeset} ->
-        {:error, changeset}
+      {:ok, user} -> {:ok, Repo.preload(user, :roles)}
+      {:error, changeset} -> {:error, changeset}
     end
   end
 
@@ -470,6 +472,11 @@ defmodule Demo.Accounts do
     %Role{}
     |> Role.changeset(attrs)
     |> Repo.insert()
+    # IMPORTANT:
+    |> case do
+      {:ok, role} -> {:ok, Repo.preload(role, :users)}
+      {:error, changeset} -> {:error, changeset}
+    end
   end
 
   @doc """

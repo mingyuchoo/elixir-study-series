@@ -47,7 +47,10 @@ defmodule Demo.Todos do
 
   @doc """
   Creates a list.
-
+  NOTE:
+  리스트를 생성한 뒤 preload 하지 않으면
+  연관된 데이터가 없어 목록을 화면에 표현할 때
+  오류가 발생할 수 있음
   ## Examples
 
       iex> create_list(%{field: value})
@@ -59,9 +62,12 @@ defmodule Demo.Todos do
   """
   def create_list(attrs \\ %{}) do
     %List{}
-    |> Repo.preload(:items)
     |> List.changeset(attrs)
     |> Repo.insert()
+    |> case do
+      {:ok, list} -> {:ok, Repo.preload(list, :items)}
+      {:error, changeset} -> {:error, changeset}
+    end
   end
 
   @doc """
@@ -150,7 +156,9 @@ defmodule Demo.Todos do
 
   @doc """
   Creates a item.
-
+  NOTE:
+  아이템을 생성한 뒤 preload 하지 않으면 목록을 보여줄 때
+  item.list 데이터가 없어 목록을 생성할 또 오류 발생함
   ## Examples
 
       iex> create_item(%{field: value})
@@ -164,6 +172,11 @@ defmodule Demo.Todos do
     %Item{}
     |> Item.changeset(attrs)
     |> Repo.insert()
+    # IMPORTANT:
+    |> case do
+      {:ok, item} -> {:ok, Repo.preload(item, :list)}
+      {:error, changeset} -> {:error, changeset}
+    end
   end
 
   @doc """

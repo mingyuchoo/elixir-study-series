@@ -18,13 +18,14 @@ defmodule DemoWeb.UserLive.Settings do
           phx-submit="update_email"
           phx-change="validate_email"
         >
-          <.input field={@email_form[:email]} type="email" label="Email" required />
+          <.input field={@email_form[:email]} type="email" label="Email" placeholder="Your e-mail address" required />
           <.input
             field={@email_form[:current_password]}
             name="current_password"
             id="current_password_for_email"
             type="password"
             label="Current password"
+            placeholder="Your current password"
             value={@email_form_current_password}
             required
           />
@@ -44,9 +45,20 @@ defmodule DemoWeb.UserLive.Settings do
           phx-trigger-action={@trigger_submit}
         >
           <.input
+            field={@password_form[:current_password]}
+            name="current_password"
+            id="current_password_for_password"
+            type="password"
+            label="Current password"
+            placeholder="Your current password"
+            value={@current_password}
+            required
+          />
+          <.input
             field={@password_form[:email]}
             type="hidden"
             id="hidden_user_email"
+            placeholder="Your new password"
             value={@current_email}
           />
           <.input field={@password_form[:password]} type="password" label="New password" required />
@@ -54,15 +66,7 @@ defmodule DemoWeb.UserLive.Settings do
             field={@password_form[:password_confirmation]}
             type="password"
             label="Confirm new password"
-          />
-          <.input
-            field={@password_form[:current_password]}
-            name="current_password"
-            type="password"
-            label="Current password"
-            id="current_password_for_password"
-            value={@current_password}
-            required
+            placeholder="Your new password again"
           />
           <:actions>
             <.button phx-disable-with="Changing...">Change Password</.button>
