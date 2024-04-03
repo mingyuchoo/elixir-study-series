@@ -89,7 +89,7 @@ defmodule DemoWeb.UserLive.FormComponent do
         {:ok, _} =
           Accounts.deliver_user_confirmation_instructions(
             user,
-            &url(~p"/admin/users/confirm/#{&1}")
+            &url(~p"/users/confirm/#{&1}")
           )
 
         {:noreply,

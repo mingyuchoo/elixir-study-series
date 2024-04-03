@@ -1,7 +1,7 @@
 <.header>
   Listing Users
   <:actions>
-    <.link patch={~p"/admin/users/new"}>
+    <.link patch={~p"/accounts/users/new"}>
       <.button>New User</.button>
     </.link>
   </:actions>
@@ -10,7 +10,7 @@
 <.table
   id="users"
   rows={@streams.users}
-  row_click={fn {_id, user} -> JS.navigate(~p"/admin/users/#{user}") end}
+  row_click={fn {_id, user} -> JS.navigate(~p"/accounts/users/#{user}") end}
 >
   <:col :let={{_id, user}} label="Email"><%= user.email %></:col>
   <:col :let={{_id, user}} label="Nickname">
@@ -19,9 +19,9 @@
   <:col :let={{_id, user}} label="Roles"><%= Enum.count(user.roles) %></:col>
   <:action :let={{_id, user}}>
     <div class="sr-only">
-      <.link navigate={~p"/admin/users/#{user}"}>Show</.link>
+      <.link navigate={~p"/accounts/users/#{user}"}>Show</.link>
     </div>
-    <.link patch={~p"/admin/users/#{user}/edit"}>Edit</.link>
+    <.link patch={~p"/accounts/users/#{user}/edit"}>Edit</.link>
   </:action>
   <:action :let={{id, user}}>
     <.link
@@ -37,7 +37,7 @@
   :if={@live_action in [:new, :edit]}
   id="user-modal"
   show
-  on_cancel={JS.patch(~p"/admin/users")}
+  on_cancel={JS.patch(~p"/accounts/users")}
 >
   <.live_component
     module={DemoWeb.UserLive.FormComponent}
@@ -45,6 +45,6 @@
     title={@page_title}
     action={@live_action}
     user={@user}
-    patch={~p"/admin/users"}
+    patch={~p"/accounts/users"}
   />
 </.modal>

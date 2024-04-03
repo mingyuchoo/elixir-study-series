@@ -6,7 +6,7 @@ defmodule Demo.Repo.Migrations.CreateRoles do
       add :name, :string, null: false
       add :description, :string
       add :user_count, :integer, null: false, default: 0
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
 
     create unique_index(:roles, [:name])

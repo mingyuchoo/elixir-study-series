@@ -69,17 +69,29 @@ defmodule DemoWeb.Router do
       live "/users/settings", UserLive.Settings, :edit
       live "/users/settings/confirm_email/:token", UserLive.Settings, :confirm_email
 
-      live "/admin/roles", RoleLive.Index, :index
-      live "/admin/roles/new", RoleLive.Index, :new
-      live "/admin/roles/:id/edit", RoleLive.Index, :edit
-      live "/admin/roles/:id", RoleLive.Show, :show
-      live "/admin/roles/:id/show/edit", RoleLive.Show, :edit
+      live "/todos/lists", ListLive.Index, :index
+      live "/todos/lists/new", ListLive.Index, :new
+      live "/todos/lists/:id/edit", ListLive.Index, :edit
+      live "/todos/lists/:id", ListLive.Show, :show
+      live "/todos/lists/:id/show/edit", ListLive.Show, :edit
 
-      live "/admin/users", UserLive.Index, :index
-      live "/admin/users/new", UserLive.Index, :new
-      live "/admin/users/:id/edit", UserLive.Index, :edit
-      live "/admin/users/:id", UserLive.Show, :show
-      live "/admin/users/:id/show/edit", UserLive.Show, :edit
+      live "/todos/items", ItemLive.Index, :index
+      live "/todos/items/new", ItemLive.Index, :new
+      live "/todos/items/:id/edit", ItemLive.Index, :edit
+      live "/todos/items/:id", ItemLive.Show, :show
+      live "/todos/items/:id/show/edit", ItemLive.Show, :edit
+
+      live "/accounts/roles", RoleLive.Index, :index
+      live "/accounts/roles/new", RoleLive.Index, :new
+      live "/accounts/roles/:id/edit", RoleLive.Index, :edit
+      live "/accounts/roles/:id", RoleLive.Show, :show
+      live "/accounts/roles/:id/show/edit", RoleLive.Show, :edit
+
+      live "/accounts/users", UserLive.Index, :index
+      live "/accounts/users/new", UserLive.Index, :new
+      live "/accounts/users/:id/edit", UserLive.Index, :edit
+      live "/accounts/users/:id", UserLive.Show, :show
+      live "/accounts/users/:id/show/edit", UserLive.Show, :edit
     end
   end
 

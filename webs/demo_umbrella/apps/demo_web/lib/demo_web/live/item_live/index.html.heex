@@ -1,0 +1,46 @@
+<.header>
+  Listing Items
+  <:actions>
+    <.link patch={~p"/todos/items/new"}>
+      <.button>New Item</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table
+  id="items"
+  rows={@streams.items}
+  row_click={fn {_id, item} -> JS.navigate(~p"/todos/items/#{item}") end}
+>
+  <:col :let={{_id, item}} label="Title"><%= item.title %></:col>
+  <:action :let={{_id, item}}>
+    <div class="sr-only">
+      <.link navigate={~p"/todos/items/#{item}"}>Show</.link>
+    </div>
+    <.link patch={~p"/todos/items/#{item}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={{id, item}}>
+    <.link
+      phx-click={JS.push("delete", value: %{id: item.id}) |> hide("##{id}")}
+      data-confirm="Are you sure?"
+    >
+      Delete
+    </.link>
+  </:action>
+</.table>
+
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="item-modal"
+  show
+  on_cancel={JS.patch(~p"/todos/items")}
+>
+  <.live_component
+    module={DemoWeb.ItemLive.FormComponent}
+    id={@item.id || :new}
+    title={@page_title}
+    action={@live_action}
+    item={@item}
+    patch={~p"/todos/items"}
+  />
+</.modal>

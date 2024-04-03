@@ -9,7 +9,7 @@ defmodule Demo.Repo.Migrations.CreateUsersAuthTables do
       add :hashed_password, :string, null: false
       add :confirmed_at, :naive_datetime
       add :nickname, :string
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
 
     create unique_index(:users, [:email])

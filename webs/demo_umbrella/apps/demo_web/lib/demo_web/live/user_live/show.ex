@@ -30,7 +30,7 @@ defmodule DemoWeb.UserLive.Show do
 
     {:ok, _} = Accounts.delete_user(user)
 
-    {:noreply, push_navigate(socket, to: "/admin/users")}
+    {:noreply, push_navigate(socket, to: "/accounts/users")}
   end
 
   defp page_title(:show), do: "Show User"

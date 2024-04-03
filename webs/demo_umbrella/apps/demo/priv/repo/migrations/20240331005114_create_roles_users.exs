@@ -8,7 +8,7 @@ defmodule Demo.Repo.Migrations.CreateRolesUsers do
     create table(:roles_users) do
       add :role_id, references(:roles, on_delete: :delete_all), null: false
       add :user_id, references(:users, on_delete: :delete_all), null: false
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
 
     # NOTE:
