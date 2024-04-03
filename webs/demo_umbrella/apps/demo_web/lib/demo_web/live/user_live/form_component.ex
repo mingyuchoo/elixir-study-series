@@ -23,14 +23,11 @@ defmodule DemoWeb.UserLive.FormComponent do
         <.input field={@form[:email]} type="text" label="Email" placeholder="Your email" />
         <.input field={@form[:password]} type="password" label="Password" placeholder="Your password" />
         <.input field={@form[:nickname]} type="text" label="Nickname" placeholder="Your nickname" />
-        <!-- 추가 -->
-        <.input
-          field={@form[:role_id]}
-          type="select"
-          label="Role"
-          prompt="Select a role"
-          options={Enum.map(@roles, &{&1.name, &1.id})}
-        />
+        <!--
+        리스트 셀렉트박스 추가
+          - prompt 를 넣으면 기본 선택 안 됨
+        -->
+        <.input field={@form[:role_id]} type="select" label="Roles" options={Enum.map(@roles, &{&1.name, &1.id})} />
         <:actions>
           <.button phx-disable-with="Saving...">Save User</.button>
         </:actions>

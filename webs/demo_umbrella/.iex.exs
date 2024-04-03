@@ -1,15 +1,7 @@
 alias Demo.Repo
-alias Demo.Accounts
-alias Demo.Accounts.{Role, RoleUser, User}
 
-user = %User{}
+alias Demo.Todos
+alias Demo.Todos.{List, Item}
 
-attrs = %{
-  "email" => "mingyuchoo@gmail.com",
-  "nickname" => "Choo",
-  "password" => "qwe123QWE!@#",
-  "role_id" => "1"
-}
-
-user_pre = Repo.preload(user, :roles)
-user_changeset = Ecto.Changeset.cast(user_pre, attrs, [:email, :password])
+attrs = %{"title" => "Hello", "list_id" => "1"}
+item_changeset = Ecto.Changeset.cast(%Item{}, attrs, [:title])

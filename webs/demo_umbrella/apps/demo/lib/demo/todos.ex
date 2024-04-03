@@ -124,9 +124,10 @@ defmodule Demo.Todos do
 
   """
   def list_items do
-    from(i in Item)
+    from(i in Item, preload: [:list])
     |> Repo.all()
   end
+
 
   @doc """
   Gets a single item.
@@ -143,7 +144,7 @@ defmodule Demo.Todos do
 
   """
   def get_item!(id) do
-    from(i in Item, where: i.id == ^id)
+    from(i in Item, where: i.id == ^id, preload: [:list])
     |> Repo.one!()
   end
 

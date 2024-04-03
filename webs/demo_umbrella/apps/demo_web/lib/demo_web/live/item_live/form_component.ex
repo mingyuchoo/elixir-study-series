@@ -19,6 +19,11 @@ defmodule DemoWeb.ItemLive.FormComponent do
         phx-change="validate"
         phx-submit="save"
       >
+        <!--
+        리스트 셀렉트박스 추가
+          - prompt 를 넣으면 기본 선택 안 됨
+        -->
+        <.input field={@form[:list_id]} type="select" label="Lists" options={Enum.map(@lists, &{&1.title, &1.id})} />
         <.input field={@form[:title]} type="text" label="Title" />
         <:actions>
           <.button phx-disable-with="Saving...">Save Item</.button>
@@ -28,13 +33,20 @@ defmodule DemoWeb.ItemLive.FormComponent do
     """
   end
 
+  @doc """
+  데이터를 컴포넌트에 전달하는데 사용
+  """
   @impl true
   def update(%{item: item} = assigns, socket) do
     changeset = Todos.change_item(item)
+    # 모든 리스트를 가져옴
+    lists = Todos.list_lists()
 
     {:ok,
      socket
      |> assign(assigns)
+     # 리스트 데이터를 소켓에 할당
+     |> assign(:lists, lists)
      |> assign_form(changeset)}
   end
 

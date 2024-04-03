@@ -10,7 +10,7 @@
 
 <.list>
   <:item title="Title"><%= @item.title %></:item>
-  <:item title="Number of Lists"><%= Enum.count(@item.lists) %></:item>
+  <:item title="List"><%= @item.list.title %></:item>
 </.list>
 
 <.back navigate={~p"/todos/items"}>Back to items</.back>
