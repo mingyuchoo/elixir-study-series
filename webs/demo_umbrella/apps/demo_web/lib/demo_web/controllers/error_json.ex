@@ -3,7 +3,7 @@ defmodule DemoWeb.ErrorJSON do
   # you may add your own clauses, such as:
   #
   # def render("500.json", _assigns) do
-  #   %{errors: %{detail: "Internal Server Error"}}
+  #    %{errors: %{detail: "Internal Server Error"}}
   # end
 
   # By default, Phoenix returns the status message from

@@ -18,7 +18,13 @@ defmodule DemoWeb.UserLive.Settings do
           phx-submit="update_email"
           phx-change="validate_email"
         >
-          <.input field={@email_form[:email]} type="email" label="Email" placeholder="Your e-mail address" required />
+          <.input
+            field={@email_form[:email]}
+            type="email"
+            label="Email"
+            placeholder="Your e-mail address"
+            required
+          />
           <.input
             field={@email_form[:current_password]}
             name="current_password"

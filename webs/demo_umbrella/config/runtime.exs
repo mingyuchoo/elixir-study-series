@@ -50,7 +50,7 @@ if config_env() == :prod do
   # If you are doing OTP releases, you need to instruct Phoenix
   # to start each relevant endpoint:
   #
-  #     config :demo_web, DemoWeb.Endpoint, server: true
+  #      config :demo_web, DemoWeb.Endpoint, server: true
   #
   # Then you can assemble a release by calling `mix release`.
   # See `mix help release` for more information.
@@ -60,14 +60,14 @@ if config_env() == :prod do
   # To get SSL working, you will need to add the `https` key
   # to your endpoint configuration:
   #
-  #     config :demo_web, DemoWeb.Endpoint,
-  #       https: [
-  #         ...,
-  #         port: 443,
-  #         cipher_suite: :strong,
-  #         keyfile: System.get_env("SOME_APP_SSL_KEY_PATH"),
-  #         certfile: System.get_env("SOME_APP_SSL_CERT_PATH")
-  #       ]
+  #      config :demo_web, DemoWeb.Endpoint,
+  #        https: [
+  #          ...,
+  #          port: 443,
+  #          cipher_suite: :strong,
+  #          keyfile: System.get_env("SOME_APP_SSL_KEY_PATH"),
+  #          certfile: System.get_env("SOME_APP_SSL_CERT_PATH")
+  #        ]
   #
   # The `cipher_suite` is set to `:strong` to support only the
   # latest and more secure SSL ciphers. This means old browsers
@@ -82,8 +82,8 @@ if config_env() == :prod do
   # We also recommend setting `force_ssl` in your config/prod.exs,
   # ensuring no data is ever sent via http, always redirecting to https:
   #
-  #     config :demo_web, DemoWeb.Endpoint,
-  #       force_ssl: [hsts: true]
+  #      config :demo_web, DemoWeb.Endpoint,
+  #        force_ssl: [hsts: true]
   #
   # Check `Plug.SSL` for all available options in `force_ssl`.
 
@@ -93,15 +93,15 @@ if config_env() == :prod do
   # Also, you may need to configure the Swoosh API client of your choice if you
   # are not using SMTP. Here is an example of the configuration:
   #
-  #     config :demo, Demo.Mailer,
-  #       adapter: Swoosh.Adapters.Mailgun,
-  #       api_key: System.get_env("MAILGUN_API_KEY"),
-  #       domain: System.get_env("MAILGUN_DOMAIN")
+  #      config :demo, Demo.Mailer,
+  #        adapter: Swoosh.Adapters.Mailgun,
+  #        api_key: System.get_env("MAILGUN_API_KEY"),
+  #        domain: System.get_env("MAILGUN_DOMAIN")
   #
   # For this example you need include a HTTP client required by Swoosh API client.
   # Swoosh supports Hackney and Finch out of the box:
   #
-  #     config :swoosh, :api_client, Swoosh.ApiClient.Hackney
+  #      config :swoosh, :api_client, Swoosh.ApiClient.Hackney
   #
   # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
 

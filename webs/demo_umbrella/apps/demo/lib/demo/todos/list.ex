@@ -18,5 +18,6 @@ defmodule Demo.Todos.List do
     list
     |> cast(attrs, [:title, :item_count])
     |> validate_required([:title])
+    |> foreign_key_constraint(:items)
   end
 end

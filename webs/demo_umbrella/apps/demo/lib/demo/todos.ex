@@ -4,8 +4,8 @@ defmodule Demo.Todos do
   """
 
   import Ecto.Query, warn: false
-  alias Demo.Repo
 
+  alias Demo.Repo
   alias Demo.Todos.List
 
   @doc """
@@ -118,6 +118,8 @@ defmodule Demo.Todos do
     List.changeset(list, attrs)
   end
 
+  # ---------------------------------------------------------------------
+
   alias Demo.Todos.Item
 
   @doc """
@@ -133,7 +135,6 @@ defmodule Demo.Todos do
     from(i in Item, preload: [:list])
     |> Repo.all()
   end
-
 
   @doc """
   Gets a single item.

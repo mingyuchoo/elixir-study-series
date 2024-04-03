@@ -13,11 +13,11 @@ defmodule Demo.Umbrella.MixProject do
 
   # Dependencies can be Hex packages:
   #
-  #   {:mydep, "~> 0.3.0"}
+  #    {:mydep, "~> 0.3.0"}
   #
   # Or git/path repositories:
   #
-  #   {:mydep, git: "https://github.com/elixir-lang/mydep.git", tag: "0.1.0"}
+  #    {:mydep, git: "https://github.com/elixir-lang/mydep.git", tag: "0.1.0"}
   #
   # Type "mix help deps" for more examples and options.
   #
@@ -33,7 +33,7 @@ defmodule Demo.Umbrella.MixProject do
   # Aliases are shortcuts or tasks specific to the current project.
   # For example, to install project dependencies and perform other setup tasks, run:
   #
-  #     $ mix setup
+  #      $ mix setup
   #
   # See the documentation for `Mix` for more info on aliases.
   #

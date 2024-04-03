@@ -27,7 +27,12 @@ defmodule DemoWeb.UserLive.FormComponent do
         리스트 셀렉트박스 추가
           - prompt 를 넣으면 기본 선택 안 됨
         -->
-        <.input field={@form[:role_id]} type="select" label="Roles" options={Enum.map(@roles, &{&1.name, &1.id})} />
+        <.input
+          field={@form[:role_id]}
+          type="select"
+          label="Roles"
+          options={Enum.map(@roles, &{&1.name, &1.id})}
+        />
         <:actions>
           <.button phx-disable-with="Saving...">Save User</.button>
         </:actions>

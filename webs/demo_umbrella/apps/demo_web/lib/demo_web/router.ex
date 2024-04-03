@@ -25,7 +25,7 @@ defmodule DemoWeb.Router do
 
   # Other scopes may use custom stacks.
   # scope "/api", DemoWeb do
-  #   pipe_through :api
+  #    pipe_through :api
   # end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

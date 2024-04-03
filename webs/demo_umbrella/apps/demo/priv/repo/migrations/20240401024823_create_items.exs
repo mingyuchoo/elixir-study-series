@@ -4,7 +4,7 @@ defmodule Demo.Repo.Migrations.CreateItems do
   def change do
     create table(:items) do
       add :title, :string
-      add :list_id, references(:lists, on_delete: :nothing)
+      add :list_id, references(:lists, on_delete: :delete_all)
       timestamps(type: :utc_datetime)
     end
 

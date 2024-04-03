@@ -3,7 +3,7 @@
   <:subtitle>This is a role record from your database.</:subtitle>
   <:actions>
     <.link patch={~p"/accounts/roles/#{@role}/show/edit"} phx-click={JS.push_focus()}>
-      <.button>Edit role</.button>
+      <.button>Edit</.button>
     </.link>
     <!-- 추가 -->
     <.link phx-click={JS.push("delete", value: %{id: @role.id})} data-confirm="Are you sure?">

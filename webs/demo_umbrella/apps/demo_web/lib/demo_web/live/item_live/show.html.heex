@@ -3,7 +3,10 @@
   <:subtitle>This is a item record from your database.</:subtitle>
   <:actions>
     <.link patch={~p"/todos/items/#{@item}/show/edit"} phx-click={JS.push_focus()}>
-      <.button>Edit item</.button>
+      <.button>Edit</.button>
+    </.link>
+    <.link phx-click={JS.push("delete", value: %{id: @item.id})} data-confirm="Are you sure?">
+      <.button>Delete</.button>
     </.link>
   </:actions>
 </.header>

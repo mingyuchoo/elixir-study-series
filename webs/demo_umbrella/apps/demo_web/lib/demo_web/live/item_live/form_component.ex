@@ -23,8 +23,14 @@ defmodule DemoWeb.ItemLive.FormComponent do
         리스트 셀렉트박스 추가
           - prompt 를 넣으면 기본 선택 안 됨
         -->
-        <.input field={@form[:list_id]} type="select" label="Lists" options={Enum.map(@lists, &{&1.title, &1.id})} />
-        <.input field={@form[:title]} type="text" label="Title" placeholder="New item title"/>
+        <.input
+          field={@form[:list_id]}
+          type="select"
+          label="Lists"
+          prompt="No list selected"
+          options={Enum.map(@lists, &{&1.title, &1.id})}
+        />
+        <.input field={@form[:title]} type="text" label="Title" placeholder="New item title" />
         <:actions>
           <.button phx-disable-with="Saving...">Save Item</.button>
         </:actions>

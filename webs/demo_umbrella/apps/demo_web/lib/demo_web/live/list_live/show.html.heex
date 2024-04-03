@@ -3,8 +3,11 @@
   <:subtitle>This is a list record from your database.</:subtitle>
   <:actions>
     <.link patch={~p"/todos/lists/#{@list}/show/edit"} phx-click={JS.push_focus()}>
-      <.button>Edit list</.button>
+      <.button>Edit</.button>
     </.link>
+  <.link phx-click={JS.push("delete", value: %{id: @list.id})} data-confirm="Are you sure?">
+    <.button>Delte</.button>
+  </.link>
   </:actions>
 </.header>
 
