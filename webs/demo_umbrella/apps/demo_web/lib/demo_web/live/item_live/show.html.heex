@@ -18,7 +18,12 @@
 
 <.back navigate={~p"/todos/items"}>Back to items</.back>
 
-<.modal :if={@live_action == :edit} id="item-modal" show on_cancel={JS.patch(~p"/todos/items/#{@item}")}>
+<.modal
+  :if={@live_action == :edit}
+  id="item-modal"
+  show
+  on_cancel={JS.patch(~p"/todos/items/#{@item}")}
+>
   <.live_component
     module={DemoWeb.ItemLive.FormComponent}
     id={@item.id}

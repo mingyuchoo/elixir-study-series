@@ -4,8 +4,9 @@ defmodule Demo.Todos.Item do
 
   alias Demo.Todos.List
 
+  @primary_key {:item_id, :id, autogenerate: true}
   schema "items" do
-    field :title, :string
+    field :item_title, :string
 
     belongs_to :list, List
 
@@ -15,7 +16,7 @@ defmodule Demo.Todos.Item do
   @doc false
   def changeset(item, attrs) do
     item
-    |> cast(attrs, [:title, :list_id])
-    |> validate_required([:title, :list_id])
+    |> cast(attrs, [:item_title, :list_id])
+    |> validate_required([:item_title, :list_id])
   end
 end

@@ -4,9 +4,10 @@ defmodule Demo.Todos.List do
 
   alias Demo.Todos.Item
 
+  @primary_key {:list_id, :id, autogenerate: true}
   schema "lists" do
-    field :title, :string
-    field :item_count, :integer, default: 0
+    field :list_title, :string
+    field :list_item_count, :integer, default: 0
 
     has_many :items, Item
 
@@ -16,8 +17,8 @@ defmodule Demo.Todos.List do
   @doc false
   def changeset(list, attrs) do
     list
-    |> cast(attrs, [:title, :item_count])
-    |> validate_required([:title])
+    |> cast(attrs, [:list_title, :list_item_count])
+    |> validate_required([:list_title])
     |> foreign_key_constraint(:items)
   end
 end
