@@ -21,7 +21,7 @@ nix-env -iA inotify-tools
 - <https://elixir-lang.org/install.html>
 - <https://www.phoenixframework.org/>
 
-## Release Elixir
+## Build for Release
 
 ```bash
 export SECRET_KEY_BASE=$(mix phx.gen.secret)
