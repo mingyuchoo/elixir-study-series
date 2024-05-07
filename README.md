@@ -11,13 +11,25 @@
 ### NixOS
 
 ```bash
-$ nix-env -iA erlang_26
-$ nix-env -iA elixir_1_16
-$ nix-env -iA inotify-tools
+nix-env -iA erlang_26
+nix-env -iA elixir_1_16
+nix-env -iA inotify-tools
 ```
-
 
 ## Learn More
 
 - <https://elixir-lang.org/install.html>
 - <https://www.phoenixframework.org/>
+
+## Release Elixir
+
+```bash
+export SECRET_KEY_BASE=$(mix phx.gen.secret)
+export DATABASE_URL=ecto://<username>:<password>@<hostname>:<port>/<datbase_name>
+mix deps.get --only prod
+MIX_ENV=prod mix compile
+MIX_ENV=prod mix assets.deploy
+mix phx.gen.release --docker
+docker build -t myapp:latest .
+docker run -it -p <extern_port>:<inner_port> --name <container> <image>:<tag> bash
+```
