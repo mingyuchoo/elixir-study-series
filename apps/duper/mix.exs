@@ -13,7 +13,7 @@ defmodule Duper.MixProject do
 
   def application do
     [
-      extra_applications: [:logger],
+      extra_applications: [:logger, :crypto],
       mod: {Duper.Application, []}
     ]
   end

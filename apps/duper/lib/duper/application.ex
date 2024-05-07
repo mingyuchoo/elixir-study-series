@@ -5,7 +5,7 @@ defmodule Duper.Application do
   def start(_type, _args) do
     children = [
       Duper.ResultStorage,
-      {Duper.PathFinder, "/home/mgch/Documents/"},
+      {Duper.PathFinder, "."},
       Duper.WorkerSupervisor,
       {Duper.ResultGatherer, 4}
     ]
