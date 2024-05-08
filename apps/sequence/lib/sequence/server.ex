@@ -1,6 +1,8 @@
 defmodule Sequence.Server do
   use GenServer
 
+  @vsn "0"
+
   @me __MODULE__
 
   def start_link _ do
