@@ -24,3 +24,9 @@ myapp-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
+
+# Others
+*.tar
+/config/*.secret.exs
+.elixir_ls/
+.elixir-tools/

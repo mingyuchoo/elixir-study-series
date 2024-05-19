@@ -35,3 +35,8 @@ discuss-*.tar
 npm-debug.log
 /assets/node_modules/
 
+# Others
+*.tar
+/config/*.secret.exs
+.elixir_ls/
+.elixir-tools/

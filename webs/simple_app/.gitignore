@@ -25,3 +25,8 @@ erl_crash.dump
 # Ignore package tarball (built via "mix hex.build").
 simple_app-*.tar
 
+# Others
+*.tar
+/config/*.secret.exs
+.elixir_ls/
+.elixir-tools/
