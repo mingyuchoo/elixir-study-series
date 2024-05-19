@@ -1,0 +1,2 @@
+export REPO_PATH="."
+export BUILD_COMMAND="make build"
