@@ -1,0 +1,51 @@
+* ASDF version manager
+** For macOS
+*** Install ASDF using Homebrew
+#+begin_src zsh
+  brew install coreutils curl git
+  brew install asdf
+#+end_src
+** Install Plugins for ASDF
+*** Install Erlang Plugin
+#+begin_src zsh
+  asdf plugin add erlang https://github.com/asdf-vm/asdf-erlang.git
+#+end_src
+*** Install Elixir Plugin
+#+begin_src zsh
+  asdf plugin-add elixir https://github.com/asdf-vm/asdf-elixir.git
+#+end_src
+*** Install Nodejs Plugin
+#+begin_src zsh
+  asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git
+#+end_src
+** Install tools using ASDF
+*** Install Erlang
+#+begin_src zsh
+  asdf install erlang <version: ex) latest>
+#+end_src
+*** Install Elixir
+#+begin_src zsh
+  asdf install elixir <version: ex) latest>
+#+end_src
+*** Install Nodejs
+#+begin_src zsh
+  asdf install nodejs <version: ex) latest>
+#+end_src
+** Set a version
+*** Global
+#+begin_src zsh
+  asdf global <tool-name> <version: ex) latest>
+  # cat $HOME/.tool-versions
+#+end_src
+*** Local
+#+begin_src zsh
+  asdf local <tool-name> <version: ex) latest>
+  # cat $PWD/.tool-versions
+#+end_src
+** Uninstall tools using ASDF
+**** Uninstall
+#+begin_src zsh
+  asdf uninstall <tool-name>
+#+end_src
+** References
+- https://asdf-vm.com/guide/getting-started.html
