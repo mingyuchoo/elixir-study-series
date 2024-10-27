@@ -11,6 +11,7 @@ defmodule SimpleApp.MixProject do
       ],
       start_permanent: Mix.env() == :prod,
       deps: [
+        {:ex_doc, "~> 0.31", only: :dev, runtime: false},
         {:phoenix, "~> 1.7.12"},
         {:jason, "~> 1.2"},
         {:bandit, "~> 1.2"}

@@ -20,6 +20,7 @@ defmodule RepoMonitor.MixProject do
 
   defp deps do
     [
+      {:ex_doc, "~> 0.31", only: :dev, runtime: false},
       {:file_system, "~> 1.0"}
     ]
   end

@@ -20,6 +20,7 @@ defmodule Duper.MixProject do
 
   defp deps do
     [
+      {:ex_doc, "~> 0.31", only: :dev, runtime: false},
       {:dir_walker, "~> 0.0.8"}
     ]
   end
