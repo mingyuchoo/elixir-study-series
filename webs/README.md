@@ -34,22 +34,22 @@ $ nix-env -i inotify-tools
 Create full featured project
 
 ```bash
-$ mix phx.new <project_name>
-$ cd <project_name>
+$ mix phx.new {project_name}
+$ cd {project_name}
 ```
 
 Create umbrella project
 
 ```bash
-$ mix phx.new <project_name> --umbrella
-$ cd <project_name>
+$ mix phx.new {project_name} --umbrella
+$ cd {project_name}
 ```
 
 Create essential featured project. this would be fit to JSON API server
 
 ```bash
-$ mix phx.new <project_name> --umbrella --no-html --no-assets --no-esbuild --no-tailwind --no-dashboard --no-ecto --no-gettext --no-live --no-mailer
-$ cd <project_name>
+$ mix phx.new {project_name} --umbrella --no-html --no-assets --no-esbuild --no-tailwind --no-dashboard --no-ecto --no-gettext --no-live --no-mailer
+$ cd {project_name}
 ```
 
 ### Install dependencies
@@ -91,7 +91,7 @@ $ iex -S mix phx.server
 
 ```bash
 export SECRET_KEY_BASE=$(mix phx.gen.secret)
-export DATABASE_URL=ecto://<username>:<password>@<hostname>:<port>/<datbase_name>
+export DATABASE_URL=ecto://{username}:{password}@{hostname}:{port}/{database-name}
 mix deps.get --only prod
 MIX_ENV=prod  # for fish, `set -x MIX_ENV prod`
 mix compile
@@ -100,7 +100,7 @@ mix phx.gen.release --docker
 # change `bullseye-20240423-slim` to `buster-20240423-slim` in Dockerfile
 # export or add in Dockerfile; SECRET_KEY_BASE=$(mix phx.gen.secret)
 docker build -t myapp:latest .
-docker run -it -e <ENV_VAR=VALUE> -p <extern_port>:<inner_port> <image>:<tag> bash
+docker run -it -e {ENV_VAR=VALUE} -p {extern-port}:{inner-port} {image}:{tag} bash
 ```
 
 ## References
