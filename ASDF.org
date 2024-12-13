@@ -14,6 +14,10 @@
 #+begin_src shell
   asdf plugin-add elixir https://github.com/asdf-vm/asdf-elixir.git
 #+end_src
+*** Install SBCL Plugin
+#+begin_src shell
+  asdf plugin-add sbcl https://github.com/smashedtoatoms/asdf-sbcl.git
+#+end_src
 *** Install Nodejs Plugin
 #+begin_src shell
   asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git
@@ -26,6 +30,10 @@
 *** Install Elixir
 #+begin_src shell
   asdf install elixir <version: ex) latest>
+#+end_src
+*** Install SBCL
+#+begin_src shell
+  asdf install sbcl <version: ex) latest>
 #+end_src
 *** Install Nodejs
 #+begin_src shell
