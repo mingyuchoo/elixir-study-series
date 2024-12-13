@@ -8,6 +8,18 @@
 
 ## Install Elixir
 
+### Arch Linux with ASDF
+
+```bash
+git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.14.1
+asdf plugin add erlang https://github.com/asdf-vm/asdf-erlang.git
+asdf plugin add elixir git@github.com:asdf-vm/asdf-elixir.git
+asdf install erlang latest
+asdf install elixir latest
+asdf global erlang latest
+asdf global exlisr latest
+```
+
 ### NixOS
 
 ```bash
@@ -16,10 +28,12 @@ nix-env -iA elixir_1_16
 nix-env -iA inotify-tools
 ```
 
-## Learn More
+## Install Phoenix Framework
 
-- <https://elixir-lang.org/install.html>
-- <https://www.phoenixframework.org/>
+```bash
+mix local.hex --force
+mix archive.install hex phx_new
+```
 
 ## Build for Release
 
@@ -36,3 +50,9 @@ mix phx.gen.release --docker
 docker build -t myapp:latest .
 docker run -it -e {ENV_VAR=VALUE} -p {extern-port}:{inner-port} {image}:{tag} bash
 ```
+
+## Learn More
+
+- <https://elixir-lang.org/install.html>
+- <https://www.phoenixframework.org/>
+
