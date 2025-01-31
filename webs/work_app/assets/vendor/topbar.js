@@ -1,5 +1,5 @@
 /**
- * @license MIT
+ * @license BSD 3-Clause
  * topbar 2.0.0, 2023-02-04
  * https://buunguyen.github.io/topbar
  * Copyright (c) 2021 Buu Nguyen
