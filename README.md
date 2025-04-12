@@ -17,7 +17,7 @@ asdf plugin add elixir git@github.com:asdf-vm/asdf-elixir.git
 asdf install erlang latest
 asdf install elixir latest
 asdf global erlang latest
-asdf global exlisr latest
+asdf global elixir latest
 ```
 
 ### NixOS
