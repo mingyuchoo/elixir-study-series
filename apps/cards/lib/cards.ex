@@ -2,6 +2,31 @@ defmodule Cards do
   @moduledoc """
   Documentation for `Cards`.
   """
+  use Application
+
+  # OTP application callback to run CLI and halt
+  def start(_type, _args) do
+    main(System.argv())
+    System.halt()
+  end
+
+  @doc """
+  Entry point for CLI. Usage: mix run -- <hand_size>
+  """
+  def main(args) do
+    case args do
+      [size_str] ->
+        case Integer.parse(size_str) do
+          {size, _} ->
+            hand = create_hand(size)
+            IO.inspect(hand)
+          :error ->
+            IO.puts("Invalid hand size: #{size_str}")
+        end
+      _ ->
+        IO.puts("Usage: mix run -- <hand_size>")
+    end
+  end
 
   @doc """
   Create hand
