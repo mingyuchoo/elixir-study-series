@@ -20,7 +20,7 @@ defmodule Identicon.MixProject do
   defp deps do
     [
       {:ex_doc, "~> 0.31", only: :dev, runtime: false},
-      {:egd, github: "erlang/egd"}
+      {:image, "~> 0.39"}
     ]
   end
 end

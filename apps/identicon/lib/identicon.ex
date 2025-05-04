@@ -23,29 +23,28 @@ defmodule Identicon do
   end
 
   def pick_color(%Identicon.Image{hex: [r, g, b | _tail]} = image) do
-    %Identicon.Image{image | color: {r, g, b}}
+    %{image | color: {r, g, b}}
   end
 
   def build_grid(%Identicon.Image{hex: hex} = image) do
     grid =
       hex
-      |> Enum.chunk(3)
+      |> Enum.chunk_every(3)
       |> Enum.map(&mirror_row/1)
       |> List.flatten()
       |> Enum.with_index()
 
-    %Identicon.Image{image | grid: grid}
+    %{image | grid: grid}
   end
 
-  def mirror_row(row) do
-    [first, second | _tail] = row
-    row ++ [second, first]
-  end
+  def mirror_row([a, b, c]), do: [a, b, c, b, a]
+def mirror_row([a, b]), do: [a, b, b, a, a]
+def mirror_row([a]), do: [a, a, a, a, a]
 
   def filter_odd_squares(%Identicon.Image{grid: grid} = image) do
     grid = Enum.filter(grid, fn {code, _index} -> rem(code, 2) == 0 end)
 
-    %Identicon.Image{image | grid: grid}
+    %{image | grid: grid}
   end
 
   def build_pixel_map(%Identicon.Image{grid: grid} = image) do
@@ -59,19 +58,29 @@ defmodule Identicon do
         {top_left, bottom_right}
       end)
 
-    %Identicon.Image{image | pixel_map: pixel_map}
+    %{image | pixel_map: pixel_map}
   end
 
-  def draw_image(%Identicon.Image{color: color, pixel_map: pixel_map}) do
-    image = :egd.create(250, 250)
-    fill = :egd.color(color)
+  def draw_image(%{color: {r, g, b}, pixel_map: pixel_map}) do
+  alias Image, as: Img
 
-    Enum.each(pixel_map, fn {start, stop} ->
-      :egd.filledRectangle(image, start, stop, fill)
+  # 250x250 흰색 배경 이미지 생성
+  {:ok, img} = Img.new(250, 250, color: :white)
+
+  # 각 사각형을 배경 위에 합성
+  img =
+    Enum.reduce(pixel_map, img, fn {{x1, y1}, {x2, y2}}, acc_img ->
+      width = x2 - x1
+      height = y2 - y1
+      {:ok, rect} = Img.Shape.rect(width, height, color: {r, g, b})
+      {:ok, composed} = Img.compose(acc_img, rect, at: {x1, y1})
+      composed
     end)
 
-    :egd.render(image)
-  end
+  # 바이너리 PNG로 변환
+  {:ok, binary} = Img.write(img, format: :png)
+  binary
+end
 
   def save_image(image, input) do
     File.write("#{input}.png", image)
