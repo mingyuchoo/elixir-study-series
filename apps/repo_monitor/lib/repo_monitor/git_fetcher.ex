@@ -2,7 +2,7 @@ defmodule RepoMonitor.GitFetcher do
   use GenServer
   require Logger
 
-  @fetch_interval :timer.seconds(5)
+  @fetch_interval 5000 # 5 seconds in milliseconds
 
   def start_link(repo_path) do
     GenServer.start_link(__MODULE__, repo_path, name: __MODULE__)
@@ -30,11 +30,18 @@ defmodule RepoMonitor.GitFetcher do
 
   defp run_fetch(repo_path) do
     Logger.info("Running git fetch in #{repo_path}")
-    {result, exit_code} = System.cmd("git", ["pull"], cd: repo_path)
-    if exit_code == 0 do
-      Logger.info("Git fetch succeeded: #{result}")
-    else
-      Logger.error("Git fetch failed with exit code #{exit_code}: #{result}")
+    
+    # Use try/rescue for better error handling in OTP 27
+    try do
+      case System.cmd("git", ["pull"], cd: repo_path) do
+        {result, 0} ->
+          Logger.info("Git fetch succeeded: #{result}")
+        {result, exit_code} ->
+          Logger.error("Git fetch failed with exit code #{exit_code}: #{result}")
+      end
+    rescue
+      e ->
+        Logger.error("Error executing git pull: #{Exception.message(e)}")
     end
   end
 end

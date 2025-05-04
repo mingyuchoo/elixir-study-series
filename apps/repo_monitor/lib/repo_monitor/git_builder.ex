@@ -15,12 +15,16 @@ defmodule RepoMonitor.GitBuilder do
 
   @impl true
   def handle_info({:file_event, _pid, {path, events}}, state) do
-    if Enum.any?(events, fn event -> event in [:created, :modified, :deleted, :renamed] end) and
-      not String.starts_with?(path, "#{state.repo_path}/target") and
-      not String.starts_with?(path, "#{state.repo_path}/.git") do
+    relevant_events = [:created, :modified, :deleted, :renamed]
+    is_relevant_event = Enum.any?(events, &(&1 in relevant_events))
+    is_excluded_path = String.starts_with?(path, "#{state.repo_path}/target") or
+                      String.starts_with?(path, "#{state.repo_path}/.git")
+    
+    if is_relevant_event and not is_excluded_path do
       Logger.info("File event [#{Enum.count(events)}] detected: #{path}")
       run_build(state.repo_path, state.build_command)
     end
+    
     {:noreply, state}
   end
 
@@ -31,11 +35,18 @@ defmodule RepoMonitor.GitBuilder do
 
   defp run_build(repo_path, build_command) do
     Logger.info("Running build command in #{repo_path}: #{build_command}")
-    {result, exit_code} = System.cmd("sh", ["-c", build_command], cd: repo_path)
-    if exit_code == 0 do
-      Logger.info("Build succeeded: #{result}")
-    else
-      Logger.error("Build failed with exit code #{exit_code}: #{result}")
+    
+    # Use try/rescue for better error handling in OTP 27
+    try do
+      case System.cmd("sh", ["-c", build_command], cd: repo_path) do
+        {result, 0} ->
+          Logger.info("Build succeeded: #{result}")
+        {result, exit_code} ->
+          Logger.error("Build failed with exit code #{exit_code}: #{result}")
+      end
+    rescue
+      e ->
+        Logger.error("Error executing build command: #{Exception.message(e)}")
     end
   end
 end
