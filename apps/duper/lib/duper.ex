@@ -1,18 +1,13 @@
 defmodule Duper do
   @moduledoc """
-  Documentation for `Duper`.
+  Main entry point for the Duper application.
+  Run with: mix run
   """
 
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Duper.hello()
-      :world
-
-  """
-  def hello do
-    :world
+  def main(_args \\ []) do
+    # Start the application supervision tree
+    {:ok, _pid} = Duper.Application.start(:normal, [])
+    # Prevent the process from immediately exiting
+    Process.sleep(:infinity)
   end
 end
