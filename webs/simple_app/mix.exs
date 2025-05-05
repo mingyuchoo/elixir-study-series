@@ -5,7 +5,7 @@ defmodule SimpleApp.MixProject do
     [
       app: :simple_app,
       version: "0.1.0",
-      elixir: "~> 1.16",
+      elixir: "~> 1.17",
       elixirc_paths: [
         "lib"
       ],

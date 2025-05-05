@@ -5,7 +5,7 @@ defmodule RepoMonitor.MixProject do
     [
       app: :repo_monitor,
       version: "0.1.0",
-      elixir: "~> 1.16",
+      elixir: "~> 1.17",
       otp_app: true,
       start_permanent: Mix.env() == :prod,
       deps: deps()
