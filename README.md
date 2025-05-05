@@ -11,7 +11,7 @@
 ### Arch Linux with ASDF
 
 ```bash
-git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.14.1
+git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.17.3
 asdf plugin add erlang https://github.com/asdf-vm/asdf-erlang.git
 asdf plugin add elixir git@github.com:asdf-vm/asdf-elixir.git
 asdf install erlang latest
@@ -23,8 +23,8 @@ asdf global elixir latest
 ### NixOS
 
 ```bash
-nix-env -iA erlang_26
-nix-env -iA elixir_1_16
+nix-env -iA erlang_27
+nix-env -iA elixir_1_17
 nix-env -iA inotify-tools
 ```
 
@@ -49,6 +49,15 @@ mix phx.gen.release --docker
 # export or add in Dockerfile; SECRET_KEY_BASE=$(mix phx.gen.secret)
 docker build -t myapp:latest .
 docker run -it -e {ENV_VAR=VALUE} -p {extern-port}:{inner-port} {image}:{tag} bash
+```
+## Update outdated modules
+
+```bash
+mix hex.outdated
+mix hex.upgrade
+mix deps.update --all
+mix deps.get
+mix compile
 ```
 
 ## Learn More
