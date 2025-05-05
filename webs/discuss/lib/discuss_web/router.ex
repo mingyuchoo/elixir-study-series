@@ -18,8 +18,15 @@ defmodule DiscussWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    
+    # 토픽 관련 경로
     get "/topics", TopicController, :index
     get "/topics/new", TopicController, :new
+    post "/topics", TopicController, :create
+    get "/topics/:id", TopicController, :show
+    get "/topics/:id/edit", TopicController, :edit
+    put "/topics/:id", TopicController, :update
+    delete "/topics/:id", TopicController, :delete
   end
 
   scope "/api", DiscussWeb do

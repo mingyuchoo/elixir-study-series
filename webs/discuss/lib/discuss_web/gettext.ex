@@ -20,5 +20,7 @@ defmodule DiscussWeb.Gettext do
 
   See the [Gettext Docs](https://hexdocs.pm/gettext) for detailed usage.
   """
-  use Gettext, otp_app: :discuss
+  use Gettext.Backend, otp_app: :discuss
+  # 이 모듈을 사용할 때는 다음과 같이 작성하세요:
+  # use Gettext, backend: DiscussWeb.Gettext
 end

@@ -1,8 +1,81 @@
-<h2>Topics</h2>
-<ul class="collection">
-  <%= for topic <- @topics do %>
-      <li class="collection-item">
-        <%= topic.title %>
-      </li>
-  <% end %>
-</ul>
+<div class="px-4 sm:px-6 lg:px-8">
+  <div class="sm:flex sm:items-center">
+    <div class="sm:flex-auto">
+      <h1 class="text-2xl font-semibold text-gray-900">토픽 목록</h1>
+      <p class="mt-2 text-sm text-gray-700">
+        모든 토픽의 목록입니다. 토픽을 추가, 수정, 삭제할 수 있습니다.
+      </p>
+    </div>
+    <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+      <a href="/topics/new" class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto">
+        <i class="material-icons">add</i>
+        토픽 추가
+      </a>
+    </div>
+  </div>
+  
+  <div class="mt-8 flex flex-col">
+    <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
+      <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+        <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+          <%= if Enum.empty?(@topics) do %>
+            <div class="bg-white px-6 py-12 text-center">
+              <div class="rounded-full bg-gray-100 p-3 inline-block">
+                <i class="material-icons text-gray-400 text-3xl">topic</i>
+              </div>
+              <h3 class="mt-2 text-sm font-medium text-gray-900">현재 등록된 토픽이 없습니다</h3>
+              <p class="mt-1 text-sm text-gray-500">첫 번째 토픽을 만들어보세요.</p>
+              <div class="mt-6">
+                <a href="/topics/new" class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                  <i class="material-icons">add</i>
+                  첫 번째 토픽 만들기
+                </a>
+              </div>
+            </div>
+          <% else %>
+            <table class="min-w-full divide-y divide-gray-300">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">토픽</th>
+                  <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6 text-right">
+                    <span class="sr-only">작업</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200 bg-white">
+                <%= for topic <- @topics do %>
+                  <tr>
+                    <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                      <%= topic.title %>
+                    </td>
+                    <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                      <div class="flex justify-end space-x-2">
+                        <a href={~p"/topics/#{topic.id}"} class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-sm font-medium text-blue-700 hover:bg-blue-100" title="상세보기">
+                          <i class="material-icons">visibility</i>
+
+                          <span class="hidden sm:inline">상세</span>
+                        </a>
+                        <a href={~p"/topics/#{topic.id}/edit"} class="inline-flex items-center rounded-md bg-yellow-50 px-2 py-1 text-sm font-medium text-yellow-700 hover:bg-yellow-100" title="수정">
+                          <i class="material-icons">edit</i>
+                          <span class="hidden sm:inline">수정</span>
+                        </a>
+                        <a href="#" onclick={"event.preventDefault(); document.getElementById('delete-form-#{topic.id}').submit();"} class="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-sm font-medium text-red-700 hover:bg-red-100" title="삭제">
+                          <i class="material-icons">delete</i>
+                          <span class="hidden sm:inline">삭제</span>
+                        </a>
+                        <form id={"delete-form-#{topic.id}"} action={~p"/topics/#{topic.id}"} method="post" class="hidden">
+                          <input type="hidden" name="_method" value="delete">
+                          <input type="hidden" name="_csrf_token" value={get_csrf_token()}>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

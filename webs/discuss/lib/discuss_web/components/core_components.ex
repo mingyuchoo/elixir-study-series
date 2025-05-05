@@ -17,7 +17,7 @@ defmodule DiscussWeb.CoreComponents do
   use Phoenix.Component
 
   alias Phoenix.LiveView.JS
-  import DiscussWeb.Gettext
+  use Gettext, backend: DiscussWeb.Gettext
 
   @doc """
   Renders a modal.
