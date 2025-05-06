@@ -1,0 +1,27 @@
+# Networks
+networks:
+  docker-link:
+    external: true
+
+# Services
+services:
+  postgresql-db:
+    image: postgres:latest
+    container_name: postgresql-db
+    restart: always
+    ports:
+      - "5432:5432"
+    networks:
+      - docker-link
+    environment:
+      DEBUG: false
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      ADDITIONAL_DB: test
+      ADDITIONAL_SCHEMA: test
+      ADDITIONAL_USER: test
+      ADDITIONAL_PASSWORD: test
+    volumes:
+      - ./init/:/docker-entrypoint-initdb.d/
+      - /var/docker/postgresql/data:/var/lib/postgresql/data

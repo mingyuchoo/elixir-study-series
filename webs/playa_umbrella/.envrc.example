@@ -1,0 +1,5 @@
+export ENV="prod"
+export DOCKER_NETWORK="docker-link"
+export DATABASE_HOST="localhost"
+export DATABASE_URL="ecto://postgres:postgres@${DATABASE_HOST}:5432/playa_dev"
+export SECRET_KEY_BASE="<SECRET_KEY>"

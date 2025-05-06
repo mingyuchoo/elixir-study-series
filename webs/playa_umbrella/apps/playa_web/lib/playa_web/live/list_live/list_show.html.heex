@@ -1,0 +1,127 @@
+<.back navigate={~p"/works/lists"}>Back to my lists</.back>
+
+<.header>
+  My #<%= @list.id %> list
+  <:subtitle>This is a list record from your database.</:subtitle>
+  <:actions>
+    <.link patch={~p"/works/lists/#{@list.id}/show/edit"} phx-click={JS.push_focus()}>
+      <.button><.icon name="hero-pencil" /></.button>
+    </.link>
+    <.link
+      phx-click={JS.push("delete:list_delete", value: %{list_id: @list.id})}
+      data-confirm="Are you sure?"
+    >
+      <.button><.icon name="hero-trash" /></.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="ID">#<%= @list.id %></:item>
+  <:item title="Title"><%= @list.title %></:item>
+  <:item title="Total items"><%= @list.item_count %> item(s)</:item>
+  <:item title="Created by">
+    <.link navigate={~p"/accounts/users/#{@list.user.id}"} class="underline">
+      <%= @list.user.nickname || "##{@list.user.id}" %>
+    </.link>
+  </:item>
+  <:item title="Inserted at"><%= Timex.format!(@list.inserted_at, "%F %T", :strftime) %></:item>
+  <:item title="Updated at"><%= Timex.format!(@list.updated_at, "%F %T", :strftime) %></:item>
+</.list>
+<!-- Items by list_id -->
+<div class="pt-20">
+  <.header level="h2">
+    Items in <%= @list.title %>
+    <:actions>
+      <.link patch={~p"/works/lists/#{@list.id}/items/new"}>
+        <.button><.icon name="hero-plus" /></.button>
+      </.link>
+    </:actions>
+  </.header>
+
+  <.table
+    id="items"
+    rows={@streams.items}
+    row_click={
+      fn {_id, item} -> JS.navigate(~p"/works/lists/#{@list.id}/items/#{item.id}/edit") end
+    }
+  >
+    <!-- 취소선 적용 -->
+    <:col :let={{_id, item}} label="ID">#<%= item.id %></:col>
+    <:col :let={{_id, item}} label="Title">
+      <span class={
+        case item.status do
+          :todo -> ""
+          :doing -> "font-bold"
+          :done -> "font-light line-through"
+        end
+      }>
+        <%= item.title %>
+      </span>
+    </:col>
+    <:col :let={{_id, item}} label="Status"><%= item.status %></:col>
+    <:col :let={{_id, item}} label="User">
+      <.link navigate={~p"/accounts/users/#{item.user.id}"} class="underline">
+        <%= item.user.nickname %>
+      </.link>
+    </:col>
+    <:action :let={{_id, item}}>
+      <div class="sr-only">
+        <.link patch={~p"/works/lists/#{@list.id}/items/#{item.id}/edit"}>
+          <.icon name="hero-pencil-square-micro" />
+        </.link>
+      </div>
+    </:action>
+    <:action :let={{id, item}}>
+      <.link
+        phx-click={JS.push("delete:item_delete", value: %{item_id: item.id}) |> hide("##{id}")}
+        data-confirm="Are you sure?"
+      >
+        <.icon name="hero-trash-micro" />
+      </.link>
+    </:action>
+  </.table>
+</div>
+
+<.modal
+  :if={@live_action in [:item_new, :item_edit]}
+  id="item-modal"
+  show
+  on_cancel={JS.patch(~p"/works/lists/#{@list.id}")}
+>
+  <!-- IMPORTANT:
+      Scope를 form_component.ex 로 전달하도록 처리
+      FormCompoent.update/2 에서 scope를 socket에 저장해야 함
+  -->
+  <.live_component
+    module={PlayaWeb.ListLive.ItemFormComponent}
+    id={@item.id || :item_new}
+    title={@page_title}
+    action={@live_action}
+    list={@list}
+    item={@item}
+    scope={@scope}
+    patch={~p"/works/lists/#{@list.id}"}
+  />
+</.modal>
+<!-- -->
+<.modal
+  :if={@live_action == :list_edit}
+  id="list-modal"
+  show
+  on_cancel={JS.patch(~p"/works/lists/#{@list.id}")}
+>
+  <!-- IMPORTANT:
+      Scope를 form_component.ex 로 전달하도록 처리
+      FormCompoent.update/2 에서 scope를 socket에 저장해야 함
+  -->
+  <.live_component
+    module={PlayaWeb.ListLive.ListFormComponent}
+    id={@list.id}
+    title={@page_title}
+    action={@live_action}
+    list={@list}
+    scope={@scope}
+    patch={~p"/works/lists/#{@list.id}"}
+  />
+</.modal>

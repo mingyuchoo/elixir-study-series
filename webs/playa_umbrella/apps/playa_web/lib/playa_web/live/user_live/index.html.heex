@@ -1,0 +1,57 @@
+<.back navigate={~p"/accounts/roles"}>Back to roles</.back>
+
+<.header>
+  Listing Users
+  <:actions>
+    <.link patch={~p"/accounts/users/new"}>
+      <.button><.icon name="hero-plus" /></.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table
+  id="users"
+  rows={@streams.users}
+  row_click={fn {_id, user} -> JS.navigate(~p"/accounts/users/#{user.id}") end}
+>
+  <:col :let={{_id, user}} label="ID">#<%= user.id %></:col>
+  <:col :let={{_id, user}} label="Email"><%= user.email %></:col>
+  <:col :let={{_id, user}} label="Nickname">
+    <%= user.nickname || Phoenix.HTML.raw("<em>no nickname</em>") %>
+  </:col>
+  <:col :let={{_id, user}} label="Roles"><%= Enum.count(user.roles) %></:col>
+  <:action :let={{_id, user}}>
+    <div class="sr-only">
+      <.link navigate={~p"/accounts/users/#{user.id}"}>
+        <.icon name="hero-arrow-right-end-on-rectangle-micro" />
+      </.link>
+    </div>
+    <.link patch={~p"/accounts/users/#{user.id}/edit"}>
+      <.icon name="hero-pencil-square-micro" />
+    </.link>
+  </:action>
+  <:action :let={{id, user}}>
+    <.link
+      phx-click={JS.push("delete", value: %{user_id: user.id}) |> hide("##{id}")}
+      data-confirm="Are you sure?"
+    >
+      <.icon name="hero-trash-micro" />
+    </.link>
+  </:action>
+</.table>
+
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="user-modal"
+  show
+  on_cancel={JS.patch(~p"/accounts/users")}
+>
+  <.live_component
+    module={PlayaWeb.UserLive.FormComponent}
+    id={@user.id || :new}
+    title={@page_title}
+    action={@live_action}
+    user={@user}
+    patch={~p"/accounts/users"}
+  />
+</.modal>

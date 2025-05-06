@@ -1,0 +1,18 @@
+<div class="">
+  <.header>
+    Counter
+    <:subtitle>Hello, <%= @current_user.email %>. This is very simple example.</:subtitle>
+  </.header>
+  <div class="py-4">
+    <.button phx-click="decrement"><.icon name="hero-minus" /></.button>
+    <.button phx-click="increment"><.icon name="hero-plus" /></.button>
+  </div>
+  <.input
+    phx-keyup="update"
+    name="input_count"
+    type="number"
+    label="Count:"
+    placeholder="Input only number"
+    value={@count}
+  />
+</div>

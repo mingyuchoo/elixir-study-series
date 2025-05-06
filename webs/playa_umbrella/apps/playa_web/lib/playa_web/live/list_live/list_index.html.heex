@@ -1,0 +1,62 @@
+<.header>
+  My Lists
+  <:actions>
+    <.link patch={~p"/works/lists/new"}>
+      <.button><.icon name="hero-plus" /></.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table
+  id="lists"
+  rows={@streams.lists}
+  row_click={fn {_id, list} -> JS.navigate(~p"/works/lists/#{list.id}") end}
+>
+  <:col :let={{_id, list}} label="ID">#<%= list.id %></:col>
+  <:col :let={{_id, list}} label="Title"><%= list.title %></:col>
+  <:col :let={{_id, list}} label="Total items"><%= list.item_count %></:col>
+  <:col :let={{_id, list}} label="User">
+    <.link navigate={~p"/accounts/users/#{list.user.id}"} class="underline">
+      <%= list.user.nickname || "##{list.user.id}" %>
+    </.link>
+  </:col>
+  <:action :let={{_id, list}}>
+    <div class="sr-only">
+      <.link navigate={~p"/works/lists/#{list.id}"}>
+        <.icon name="hero-arrow-right-end-on-rectangle-micro" />
+      </.link>
+    </div>
+    <.link patch={~p"/works/lists/#{list.id}/edit"}>
+      <.icon name="hero-pencil-square-micro" />
+    </.link>
+  </:action>
+  <:action :let={{id, list}}>
+    <.link
+      phx-click={JS.push("delete", value: %{list_id: list.id}) |> hide("##{id}")}
+      data-confirm="Are you sure?"
+    >
+      <.icon name="hero-trash-micro" />
+    </.link>
+  </:action>
+</.table>
+
+<.modal
+  :if={@live_action in [:list_new, :list_edit]}
+  id="list-modal"
+  show
+  on_cancel={JS.patch(~p"/works/lists")}
+>
+  <!-- IMPORTANT:
+      Scope를 form_component.ex 로 전달하도록 처리
+      FormCompoent.update/2 에서 scope를 socket에 저장해야 함
+  -->
+  <.live_component
+    module={PlayaWeb.ListLive.ListFormComponent}
+    id={@list.id || :list_new}
+    title={@page_title}
+    action={@live_action}
+    list={@list}
+    scope={@scope}
+    patch={~p"/works/lists"}
+  />
+</.modal>

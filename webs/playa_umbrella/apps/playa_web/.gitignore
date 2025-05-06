@@ -22,6 +22,9 @@ erl_crash.dump
 # Temporary files, for example, from tests.
 /tmp/
 
+# Ignore package tarball (built via "mix hex.build").
+playa_web-*.tar
+
 # Ignore assets that are produced by build tools.
 /priv/static/assets/
 
@@ -32,12 +35,6 @@ erl_crash.dump
 npm-debug.log
 /assets/node_modules/
 
-# Others
-*.tar
-/config/*.secret.exs
+# Tools
 .elixir_ls/
 .elixir-tools/
-
-# Envrc
-.envrc
-.envrc.local
