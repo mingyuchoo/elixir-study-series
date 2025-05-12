@@ -6,19 +6,34 @@
 
 # README
 
-## Install Elixir
+## How to install `Erlang`, `Elixir`, and `SBCL`
 
-### Arch Linux with ASDF
+### Using `asdf` in Ubuntu
+
+Please install ASDF from https://asdf-vm.com/guide/getting-started.html
 
 ```bash
-git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.17.3
+sudo apt install -y libssl-dev automake autoconf libncurses-dev dirmngr gpg curl gawk libzstd-dev inotify-tools
+# Donload and install `asdf` from https://github.com/asdf-vm/asdf/releases
 asdf plugin add erlang https://github.com/asdf-vm/asdf-erlang.git
-asdf plugin add elixir git@github.com:asdf-vm/asdf-elixir.git
-asdf install erlang latest
+asdf plugin add elixir https://github.com/asdf-vm/asdf-elixir.git
+asdf plugin add sbcl https://github.com/smashedtoatoms/asdf-sbcl.git
+asdf install erlang latest 
 asdf install elixir latest
-asdf global erlang latest
-asdf global elixir latest
+asdf install sbcl latest
+vim $HOME/.tool-versions
 ```
+
+`$HOME/.tool-versions`
+
+```bash
+# $HOME/.tool-versions
+
+erlang 27.2.4
+elixir main-otp-27
+sbcl 2.5.2
+```
+Add `$HOME/.asdf/shims` to the front of your `$PATH`.
 
 ### NixOS
 
