@@ -29,9 +29,9 @@ vim $HOME/.tool-versions
 ```bash
 # $HOME/.tool-versions
 
-erlang 27.2.4
-elixir main-otp-27
-sbcl 2.5.2
+erlang 27.3.4
+elixir 1.18.3-otp-27
+sbcl 2.5.4
 ```
 Add `$HOME/.asdf/shims` to the front of your `$PATH`.
 
