@@ -33,6 +33,7 @@ erlang 27.3.4
 elixir 1.18.3-otp-27
 sbcl 2.5.4
 ```
+
 Add `$HOME/.asdf/shims` to the front of your `$PATH`.
 
 ### NixOS
