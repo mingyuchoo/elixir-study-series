@@ -1,59 +1,59 @@
 * ASDF version manager
 ** For macOS
 *** Install ASDF using Homebrew
-#+begin_src shell
+#+BEGIN_SRC shell
   brew install coreutils curl git
   brew install asdf
-#+end_src
+#+END_SRC
 ** Install Plugins for ASDF
 *** Install Erlang Plugin
-#+begin_src shell
+#+BEGIN_SRC shell
   asdf plugin add erlang https://github.com/asdf-vm/asdf-erlang.git
-#+end_src
+#+END_SRC
 *** Install Elixir Plugin
-#+begin_src shell
+#+BEGIN_SRC shell
   asdf plugin-add elixir https://github.com/asdf-vm/asdf-elixir.git
-#+end_src
+#+END_SRC
 *** Install SBCL Plugin
-#+begin_src shell
+#+BEGIN_SRC shell
   asdf plugin-add sbcl https://github.com/smashedtoatoms/asdf-sbcl.git
-#+end_src
+#+END_SRC
 *** Install Nodejs Plugin
-#+begin_src shell
+#+BEGIN_SRC shell
   asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git
-#+end_src
+#+END_SRC
 ** Install tools using ASDF
 *** Install Erlang
-#+begin_src shell
+#+BEGIN_SRC shell
   asdf install erlang <version: ex) latest>
-#+end_src
+#+END_SRC
 *** Install Elixir
-#+begin_src shell
+#+BEGIN_SRC shell
   asdf install elixir <version: ex) latest>
-#+end_src
+#+END_SRC
 *** Install SBCL
-#+begin_src shell
+#+BEGIN_SRC shell
   asdf install sbcl <version: ex) latest>
-#+end_src
+#+END_SRC
 *** Install Nodejs
-#+begin_src shell
+#+BEGIN_SRC shell
   asdf install nodejs <version: ex) latest>
-#+end_src
+#+END_SRC
 ** Set a version
 *** Global
-#+begin_src shell
+#+BEGIN_SRC shell
   asdf global <tool-name> <version: ex) latest>
   # cat $HOME/.tool-versions
-#+end_src
+#+END_SRC
 *** Local
-#+begin_src shell
+#+BEGIN_SRC shell
   asdf local <tool-name> <version: ex) latest>
   # cat $PWD/.tool-versions
-#+end_src
+#+END_SRC
 ** Uninstall tools using ASDF
 **** Uninstall
-#+begin_src shell
+#+BEGIN_SRC shell
   asdf uninstall <tool-name>
-#+end_src
+#+END_SRC
 ** References
 - [[asdf][https://asdf-vm.com/guide/getting-started.html]]
