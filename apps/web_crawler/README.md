@@ -70,8 +70,8 @@ mix run -e 'WebCrawler.CLI.main()' -- -f example.com https://example.com
 
 ## 요구사항
 
-- Erlang 27.0
-- Elixir main-otp-27
+- erlang 28.0
+- elixir main-otp-28
 
 ## 문서
 

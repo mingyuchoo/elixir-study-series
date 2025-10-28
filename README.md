@@ -29,8 +29,8 @@ vim $HOME/.tool-versions
 ```bash
 # $HOME/.tool-versions
 
-erlang 27.3.4
-elixir 1.18.3-otp-27
+erlang 28
+elixir 1.19.1-otp-28
 sbcl 2.5.4
 ```
 
