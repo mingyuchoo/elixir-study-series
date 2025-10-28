@@ -1,2 +1,0 @@
-export REPO_PATH="."
-export BUILD_COMMAND="mix run --no-halt"
