@@ -31,7 +31,7 @@ vim $HOME/.tool-versions
 
 erlang 28
 elixir 1.19.1-otp-28
-sbcl 2.5.4
+sbcl 2.5.10
 ```
 
 Add `$HOME/.asdf/shims` to the front of your `$PATH`.
