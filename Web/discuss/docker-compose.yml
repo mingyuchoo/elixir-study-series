@@ -1,0 +1,33 @@
+networks:
+  docker-link:
+    external: true
+
+services:
+  postgresql-db:
+    image: postgres:latest
+    container_name: postgresql-db
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    restart: always
+    ports:
+      - "5432:5432"
+    networks:
+      - docker-link
+    environment:
+      DEBUG: false
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      ADDITIONAL_DB: dev
+      ADDITIONAL_SCHEMA: dev
+      ADDITIONAL_USER: dev
+      ADDITIONAL_PASSWORD: P@ssw0rd!
+    volumes:
+      - ./init/:/docker-entrypoint-initdb.d/
+
+volumes:
+  postgresql-data:
