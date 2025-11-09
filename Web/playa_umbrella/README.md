@@ -90,6 +90,10 @@ $ make release
 $ _build/prod/rel/playa_umbrella/bin/playa_umbrella start
 ```
 
+## Login user
+
+- `ghost@email.com` / `qwe123QWE!@#`
+
 ## References
 
 - [Containerizing a Phoenix 1.6 Umbrella Project](https://medium.com/@alistairisrael/containerizing-a-phoenix-1-6-umbrella-project-8ec03651a59c)
