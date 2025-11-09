@@ -1,9 +1,8 @@
 all: clean create migrate run
 clean:
 	mix clean
-install:
-	mix deps.get
 create:
+	mix deps.get
 	mix ecto.create
 migrate:
 	mix ecto.migrate
