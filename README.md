@@ -71,7 +71,6 @@ docker run -it -e {ENV_VAR=VALUE} -p {extern-port}:{inner-port} {image}:{tag} ba
 ```bash
 mix hex.outdated
 # update each version of modules in mix.exs file
-mix hex.upgrade
 mix deps.update --all
 mix deps.get
 mix compile

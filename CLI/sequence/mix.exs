@@ -5,7 +5,7 @@ defmodule Sequence.MixProject do
     [
       app: :sequence,
       version: "0.1.0",
-      elixir: "~> 1.17",
+      elixir: "~> 1.19",
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]

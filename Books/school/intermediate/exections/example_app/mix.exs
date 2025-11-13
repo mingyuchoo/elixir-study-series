@@ -5,7 +5,7 @@ defmodule ExampleApp.MixProject do
     [
       app: :example_app,
       version: "0.1.0",
-      elixir: "~> 1.17",
+      elixir: "~> 1.19",
       escript: escript()
     ]
   end
