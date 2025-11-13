@@ -67,7 +67,3 @@ docker run -it -e SECRET_KEY_BASE=$SECRET_KEY_BASE -e DATABASE_URL=$DATABASE_URL
 - 자산 빌드: `mix assets.deploy` (Tailwind, esbuild, phx.digest)
 - 데이터베이스 마이그레이션/시드: `mix ecto.migrate`, `mix run priv/repo/seeds.exs`
 - 자세한 설정은 `mix.exs` 및 `config/` 디렉토리 참고
-
----
-
-문의 및 기여는 언제든 환영합니다.
