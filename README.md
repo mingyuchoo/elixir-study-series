@@ -44,14 +44,36 @@ nix-env -iA elixir_1_17
 nix-env -iA inotify-tools
 ```
 
-## Install Phoenix Framework
+## Create a new project
+
+```bash
+mix new my_app
+cd my_app
+mix test
+```
+
+## Take care of moudles in a project
+
+### Update outdated modules
+
+```bash
+mix hex.outdated
+# update each version of modules in mix.exs file
+mix deps.update --all
+mix deps.get
+mix compile
+```
+
+## Using Phoenix Framework
+
+### Install
 
 ```bash
 mix local.hex --force
 mix archive.install hex phx_new
 ```
 
-## Build for Release
+### Build for Release
 
 ```bash
 export SECRET_KEY_BASE=$(mix phx.gen.secret)
@@ -66,15 +88,7 @@ mix phx.gen.release --docker
 docker build -t myapp:latest .
 docker run -it -e {ENV_VAR=VALUE} -p {extern-port}:{inner-port} {image}:{tag} bash
 ```
-## Update outdated modules
 
-```bash
-mix hex.outdated
-# update each version of modules in mix.exs file
-mix deps.update --all
-mix deps.get
-mix compile
-```
 
 ## Learn More
 
