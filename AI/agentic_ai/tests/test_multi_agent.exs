@@ -27,7 +27,7 @@ end)
 
 if supervisors == [] or workers == [] do
   IO.puts("\n✗ 에이전트가 없습니다. 먼저 ConfigLoader를 실행하세요:")
-  IO.puts("  mix run test_config_loader.exs")
+  IO.puts("  mix run tests/test_config_loader.exs")
   System.halt(1)
 end
 
