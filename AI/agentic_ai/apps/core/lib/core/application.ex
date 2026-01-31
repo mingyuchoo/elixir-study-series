@@ -9,7 +9,10 @@ defmodule Core.Application do
     children = [
       Core.Repo,
       {Registry, keys: :unique, name: Core.Agent.Registry},
-      {Core.Agent.Supervisor, []}
+      {Core.Agent.SkillRegistry, []},
+      {Core.Agent.Supervisor, []},
+      # MCP 서버 (Model Context Protocol)
+      {Core.MCP.Server, []}
     ]
 
     opts = [strategy: :one_for_one, name: Core.Supervisor]

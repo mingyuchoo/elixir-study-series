@@ -9,7 +9,7 @@ defmodule Core.Agent.WorkerAgent do
   use GenServer
   require Logger
 
-  alias Core.Agent.{ReactEngine, ToolRegistry}
+  alias Core.Agent.{ReactEngine, ToolRegistry, SkillRegistry}
   alias Core.Contexts.Agents
   alias Core.Schema.{Agent, AgentTask}
   alias Core.Repo
@@ -175,9 +175,12 @@ defmodule Core.Agent.WorkerAgent do
     # Build initial messages
     messages = build_initial_messages(user_request, context)
 
+    # Build system prompt with skills
+    system_prompt = build_system_prompt_with_skills(state.agent)
+
     # Run ReactEngine
     opts = [
-      system_prompt: state.agent.system_prompt,
+      system_prompt: system_prompt,
       max_iterations: state.agent.max_iterations || 10
     ]
 
@@ -188,6 +191,27 @@ defmodule Core.Agent.WorkerAgent do
       {:error, reason} ->
         Logger.error("Task execution failed: #{inspect(reason)}")
         {:error, reason}
+    end
+  end
+
+  defp build_system_prompt_with_skills(agent) do
+    # Get available skills based on agent's enabled tools
+    available_skills = SkillRegistry.get_available_skills(agent.enabled_tools)
+
+    # Build skill prompt section
+    skill_prompt = SkillRegistry.build_skill_prompt(available_skills)
+
+    # Combine base system prompt with skill knowledge
+    if skill_prompt == "" do
+      agent.system_prompt
+    else
+      """
+      #{agent.system_prompt}
+
+      ---
+
+      #{skill_prompt}
+      """
     end
   end
 
