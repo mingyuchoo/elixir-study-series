@@ -13,7 +13,10 @@ defmodule Core.Agent.ToolRegistry do
     "read_file" => Tools.FileSystem,
     "write_file" => Tools.FileSystem,
     "list_directory" => Tools.FileSystem,
-    "execute_code" => Tools.CodeExecutor
+    "execute_code" => Tools.CodeExecutor,
+    # Firecrawl MCP tools
+    "firecrawl_scrape" => Tools.Firecrawl,
+    "firecrawl_search" => Tools.Firecrawl
   }
 
   @doc """

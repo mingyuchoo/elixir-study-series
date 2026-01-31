@@ -42,6 +42,12 @@ if [[ -z "$AZURE_OPENAI_API_KEY" ]]; then
     echo "       export AZURE_OPENAI_API_KEY=\"your-api-key\""
 fi
 
+if [[ -z "$FIRECRAWL_API_KEY" ]]; then
+    echo -e "${YELLOW}[WARN]${NC} FIRECRAWL_API_KEY가 설정되지 않았습니다."
+    echo "       export FIRECRAWL_API_KEY=\"your-firecrawl-api-key\""
+    echo "       (웹 스크래핑/검색 기능이 비활성화됩니다)"
+fi
+
 cd "$SCRIPT_DIR"
 
 # 의존성 확인

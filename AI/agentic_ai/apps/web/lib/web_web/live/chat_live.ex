@@ -4,7 +4,7 @@ defmodule WebWeb.ChatLive do
   alias Core.Schema.{Conversation, Message}
   alias Core.Repo
   alias Core.Agent.{Supervisor, SupervisorAgent}
-  alias Core.Contexts.Agents
+  alias Core.Contexts.{Agents, Mcps}
 
   import Ecto.Query
 
@@ -19,6 +19,7 @@ defmodule WebWeb.ChatLive do
   def mount(_params, _session, socket) do
     conversations = list_conversations()
     available_agents = Agents.list_agents(status: :active)
+    available_mcps = Mcps.list_mcps_with_status()
 
     socket =
       socket
@@ -28,6 +29,7 @@ defmodule WebWeb.ChatLive do
       |> assign(:input, "")
       |> assign(:loading, false)
       |> assign(:available_agents, available_agents)
+      |> assign(:available_mcps, available_mcps)
       |> assign(:agent_usage_history, [])
 
     {:ok, socket}
@@ -252,6 +254,40 @@ defmodule WebWeb.ChatLive do
           <% end %>
         </div>
         
+    <!-- MCP Panel -->
+        <div class="border-t border-gray-700 p-3">
+          <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+            사용 가능한 MCP
+          </div>
+          <%= if @available_mcps == [] do %>
+            <div class="text-xs text-gray-500 italic p-2">
+              설정된 MCP가 없습니다
+            </div>
+          <% else %>
+            <div class="space-y-1">
+              <%= for mcp <- @available_mcps do %>
+                <div class="flex items-center gap-2 p-2 rounded text-sm bg-gray-800 hover:bg-gray-700 transition">
+                  <span class="flex items-center justify-center w-5 h-5 bg-purple-600 text-white text-xs rounded">
+                    <.icon name="hero-server" class="w-3 h-3" />
+                  </span>
+                  <div class="flex-1 min-w-0">
+                    <div class="truncate font-medium text-purple-300">
+                      {mcp.name}
+                    </div>
+                    <div class="truncate text-xs text-gray-400">
+                      {mcp.command} {Enum.join(mcp.args, " ")}
+                    </div>
+                  </div>
+                  <!-- 신호등 상태 표시 -->
+                  <span class={mcp_status_indicator_class(mcp.status)} title={mcp_status_label(mcp.status)}>
+                    <span class={mcp_status_dot_class(mcp.status)}></span>
+                  </span>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+        
     <!-- Agent Panel -->
         <div class="border-t border-gray-700 p-3">
           <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
@@ -447,4 +483,36 @@ defmodule WebWeb.ChatLive do
   end
 
   defp render_markdown(_), do: Phoenix.HTML.raw("")
+
+  # MCP 상태 신호등 스타일
+  defp mcp_status_indicator_class(status) do
+    base = "flex items-center justify-center w-5 h-5 rounded-full"
+
+    case status do
+      :ready -> "#{base} bg-green-500/20"
+      :unavailable -> "#{base} bg-red-500/20"
+      :unknown -> "#{base} bg-gray-500/20"
+      _ -> "#{base} bg-gray-500/20"
+    end
+  end
+
+  defp mcp_status_dot_class(status) do
+    base = "w-2.5 h-2.5 rounded-full"
+
+    case status do
+      :ready -> "#{base} bg-green-500 shadow-lg shadow-green-500/50"
+      :unavailable -> "#{base} bg-red-500 shadow-lg shadow-red-500/50"
+      :unknown -> "#{base} bg-gray-500"
+      _ -> "#{base} bg-gray-500"
+    end
+  end
+
+  defp mcp_status_label(status) do
+    case status do
+      :ready -> "사용 가능"
+      :unavailable -> "환경 변수 미설정"
+      :unknown -> "상태 확인 불가"
+      _ -> "알 수 없음"
+    end
+  end
 end

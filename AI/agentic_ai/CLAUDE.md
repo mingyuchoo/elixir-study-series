@@ -269,6 +269,33 @@ Task.async_stream(collection, fn item -> process(item) end, timeout: :infinity)
 옵션:
 
 - `AZURE_OPENAI_API_VERSION`: 기본값 `2024-10-21`
+- `FIRECRAWL_API_KEY`: Firecrawl MCP 서버용 API 키 ([발급 링크](https://firecrawl.dev/app/api-keys))
+
+## MCP 서버 설정
+
+프로젝트는 `.mcp.json` 파일을 통해 MCP(Model Context Protocol) 서버를 설정합니다.
+
+### Firecrawl MCP
+
+웹 스크래핑, 크롤링, 검색 기능을 제공하는 MCP 서버입니다.
+
+```bash
+# API 키 발급
+# https://firecrawl.dev/app/api-keys
+
+# 환경 변수 설정
+export FIRECRAWL_API_KEY="your-firecrawl-api-key"
+```
+
+**사용 가능한 도구:**
+
+- `scrape`: 단일 페이지 콘텐츠 추출
+- `crawl`: 웹사이트 크롤링
+- `map`: 사이트 구조 매핑
+- `search`: 웹 검색
+- `extract`: 구조화된 데이터 추출
+
+**관련 스킬:** `config/skills/firecrawl/SKILL.md`
 
 ## 주요 라우트
 

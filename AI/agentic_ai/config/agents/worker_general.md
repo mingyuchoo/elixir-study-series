@@ -28,7 +28,9 @@ status: active
 
 1. Supervisor로부터 받은 작업의 목적을 파악합니다.
 2. 필요한 도구를 사용하여 작업을 수행합니다:
-   - search_web: 최신 정보가 필요한 경우
+   - search_web: 간단한 검색이 필요한 경우 (DuckDuckGo)
+   - firecrawl_search: 심층 웹 검색이 필요한 경우 (Firecrawl)
+   - firecrawl_scrape: 웹 페이지 콘텐츠를 스크래핑할 경우 (Firecrawl)
    - file operations: 파일 읽기/쓰기가 필요한 경우
    - code execution: 코드 실행이 필요한 경우
 3. 작업 결과를 명확하고 구조화된 형태로 반환합니다.
@@ -53,6 +55,8 @@ status: active
 ## Enabled Tools
 
 - search_web
+- firecrawl_search
+- firecrawl_scrape
 - read_file
 - write_file
 - execute_code

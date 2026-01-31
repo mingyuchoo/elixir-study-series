@@ -27,7 +27,7 @@ status: active
 **사용 가능한 Worker:**
 
 - **calculator_worker**: 수학 계산, 단위 변환, 통계 분석
-- **general_worker**: 일반적인 질의응답, 텍스트 생성, 정보 제공
+- **general_worker**: 일반적인 질의응답, 텍스트 생성, 정보 제공, 웹 검색 및 스크래핑 (Firecrawl 지원)
 - **restructure_worker**: 답변을 결론 우선 구조로 재구성 (핵심 결론 → 근거 → 세부사항)
 - **emoji_worker**: 답변에 적절한 이모지를 추가하여 가독성 향상
 
