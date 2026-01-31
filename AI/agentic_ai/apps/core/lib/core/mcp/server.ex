@@ -31,7 +31,7 @@ defmodule Core.MCP.Server do
   @server_name "agentic-ai-mcp-server"
   @server_version "1.0.0"
 
-  # Client API
+  # 클라이언트 API
 
   @doc """
   MCP 서버를 시작합니다.
@@ -78,7 +78,7 @@ defmodule Core.MCP.Server do
   """
   def protocol_version, do: @protocol_version
 
-  # Server Callbacks
+  # 서버 콜백
 
   @impl true
   def init(_opts) do
@@ -103,7 +103,7 @@ defmodule Core.MCP.Server do
     {:reply, state, state}
   end
 
-  # Private Functions
+  # 비공개 함수들
 
   defp process_request(request, state) do
     with {:ok, method} <- get_method(request),

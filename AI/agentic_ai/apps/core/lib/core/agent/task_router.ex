@@ -103,14 +103,14 @@ defmodule Core.Agent.TaskRouter do
     end
   end
 
-  # Private functions
+  # 비공개 함수들
 
   defp calculate_match_score(user_request, worker) do
     description_score = calculate_description_score(user_request, worker.description)
     tools_score = calculate_tools_score(user_request, worker.enabled_tools)
     name_score = calculate_name_score(user_request, worker.name)
 
-    # Weighted average
+    # 가중 평균
     description_score * 0.5 + tools_score * 0.3 + name_score * 0.2
   end
 
@@ -119,7 +119,7 @@ defmodule Core.Agent.TaskRouter do
       request_lower = String.downcase(user_request)
       desc_lower = String.downcase(desc)
 
-      # Count keyword matches
+      # 키워드 일치 개수 계산
       keywords = extract_keywords(desc_lower)
 
       matches =
@@ -138,7 +138,7 @@ defmodule Core.Agent.TaskRouter do
   defp calculate_tools_score(user_request, enabled_tools) do
     request_lower = String.downcase(user_request)
 
-    # Check if request matches any domain keywords
+    # 요청이 도메인 키워드와 일치하는지 확인
     matching_domains =
       Enum.filter(@domain_keywords, fn {_domain, keywords} ->
         Enum.any?(keywords, &String.contains?(request_lower, &1))
@@ -147,7 +147,7 @@ defmodule Core.Agent.TaskRouter do
     if matching_domains == [] do
       0
     else
-      # Check if worker has tools for matching domains
+      # Worker가 일치하는 도메인의 도구를 가지고 있는지 확인
       domain_names = Enum.map(matching_domains, fn {domain, _} -> to_string(domain) end)
 
       tool_matches =
@@ -167,13 +167,13 @@ defmodule Core.Agent.TaskRouter do
     request_lower = String.downcase(user_request)
     name_lower = String.downcase(name)
 
-    # Extract worker type from name (e.g., "calculator" from "calculator_worker")
+    # 이름에서 Worker 타입 추출 (예: "calculator_worker"에서 "calculator")
     worker_type =
       name_lower
       |> String.replace("_worker", "")
       |> String.replace("_agent", "")
 
-    # Check if worker type keywords match
+    # Worker 타입 키워드가 일치하는지 확인
     domain_keywords = Map.get(@domain_keywords, String.to_atom(worker_type), [])
 
     matches = Enum.count(domain_keywords, &String.contains?(request_lower, &1))

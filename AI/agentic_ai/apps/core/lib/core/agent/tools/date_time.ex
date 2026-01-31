@@ -1,6 +1,6 @@
 defmodule Core.Agent.Tools.DateTime do
   @moduledoc """
-  DateTime tool for getting current time and date operations.
+  현재 시간 및 날짜 연산을 위한 DateTime 도구.
   """
 
   def definition("get_current_time") do
@@ -36,7 +36,7 @@ defmodule Core.Agent.Tools.DateTime do
          }}
 
       {:error, :time_zone_not_found} ->
-        # Fallback to UTC
+        # UTC로 폴백
         {:ok, datetime} = DateTime.now("Etc/UTC")
 
         {:ok,

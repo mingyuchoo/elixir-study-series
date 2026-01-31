@@ -1,7 +1,7 @@
 defmodule Core.Agent.ToolRegistry do
   @moduledoc """
-  Registry for available tools that the agent can use.
-  Tools follow the OpenAI function calling specification.
+  에이전트가 사용할 수 있는 도구들의 레지스트리.
+  도구들은 OpenAI 함수 호출 명세를 따릅니다.
   """
 
   alias Core.Agent.Tools
@@ -14,13 +14,13 @@ defmodule Core.Agent.ToolRegistry do
     "write_file" => Tools.FileSystem,
     "list_directory" => Tools.FileSystem,
     "execute_code" => Tools.CodeExecutor,
-    # Firecrawl MCP tools
+    # Firecrawl MCP 도구들
     "firecrawl_scrape" => Tools.Firecrawl,
     "firecrawl_search" => Tools.Firecrawl
   }
 
   @doc """
-  Get all available tools with their definitions.
+  정의와 함께 사용 가능한 모든 도구를 가져옵니다.
   """
   def get_tools do
     @tools
@@ -31,7 +31,7 @@ defmodule Core.Agent.ToolRegistry do
   end
 
   @doc """
-  Execute a tool by name with given arguments.
+  이름으로 도구를 실행하고 주어진 인자를 전달합니다.
   """
   def execute(tool_name, arguments) do
     case Map.get(@tools, tool_name) do
@@ -48,7 +48,7 @@ defmodule Core.Agent.ToolRegistry do
   end
 
   @doc """
-  Check if a tool exists.
+  도구가 존재하는지 확인합니다.
   """
   def tool_exists?(tool_name) do
     Map.has_key?(@tools, tool_name)

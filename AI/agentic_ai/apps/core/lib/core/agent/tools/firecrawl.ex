@@ -14,7 +14,7 @@ defmodule Core.Agent.Tools.Firecrawl do
 
   @base_url "https://api.firecrawl.dev"
 
-  # Tool definitions
+  # 도구 정의
 
   def definition("firecrawl_scrape") do
     %{
@@ -56,7 +56,7 @@ defmodule Core.Agent.Tools.Firecrawl do
 
   def definition(_), do: nil
 
-  # Tool executions
+  # 도구 실행
 
   def execute("firecrawl_scrape", %{"url" => url}) do
     case get_api_key() do
@@ -81,7 +81,7 @@ defmodule Core.Agent.Tools.Firecrawl do
     end
   end
 
-  # Private functions
+  # 비공개 함수들
 
   defp get_api_key do
     case System.get_env("FIRECRAWL_API_KEY") do

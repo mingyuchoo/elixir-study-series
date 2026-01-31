@@ -1,8 +1,8 @@
 defmodule Core.Agent.Supervisor do
   @moduledoc """
-  Supervisor for agent processes.
+  에이전트 프로세스를 위한 수퍼바이저.
 
-  Manages both single-agent Workers (legacy) and multi-agent SupervisorAgents.
+  단일 에이전트 Worker(레거시)와 멀티 에이전트 SupervisorAgent를 모두 관리합니다.
   """
   use DynamicSupervisor
 
@@ -34,10 +34,10 @@ defmodule Core.Agent.Supervisor do
   end
 
   @doc """
-  Starts a single Worker agent for a conversation (legacy).
+  대화를 위한 단일 Worker 에이전트를 시작합니다 (레거시).
 
-  This function is kept for backward compatibility.
-  For multi-agent systems, use `start_supervisor_agent/2` instead.
+  이 함수는 하위 호환성을 위해 유지됩니다.
+  멀티 에이전트 시스템의 경우 `start_supervisor_agent/2`를 사용하세요.
   """
   def start_agent(conversation_id) do
     spec = {Core.Agent.Worker, conversation_id: conversation_id}

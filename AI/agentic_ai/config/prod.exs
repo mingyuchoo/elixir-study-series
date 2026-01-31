@@ -1,10 +1,10 @@
 import Config
 
-# Production configuration
+# 프로덕션 환경 설정
 config :web, WebWeb.Endpoint, cache_static_manifest: "priv/static/cache_manifest.json"
 
-# Do not print debug messages in production
+# 프로덕션에서 디버그 메시지 출력 안 함
 config :logger, level: :info
 
-# Runtime production configuration
+# 런타임 프로덕션 설정
 config :web, WebWeb.Endpoint, server: true

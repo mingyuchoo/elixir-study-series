@@ -70,7 +70,7 @@ defmodule Core.Agent.SkillRegistry do
 
   @skills_dir "config/skills"
 
-  # Client API
+  # 클라이언트 API
 
   @doc """
   SkillRegistry를 시작합니다.
@@ -142,7 +142,7 @@ defmodule Core.Agent.SkillRegistry do
     end
   end
 
-  # Server Callbacks
+  # 서버 콜백
 
   @impl true
   def init(_opts) do
@@ -205,7 +205,7 @@ defmodule Core.Agent.SkillRegistry do
     {:reply, available, state}
   end
 
-  # Private Functions
+  # 비공개 함수들
 
   defp do_load_all(dir) do
     case File.ls(dir) do
@@ -386,7 +386,7 @@ defmodule Core.Agent.SkillRegistry do
     end
   end
 
-  # Name 검증 (Agent Skills 명세)
+  # 이름 검증 (Agent Skills 명세)
   # - 1-64자
   # - 소문자, 숫자, 하이픈만 허용
   # - 하이픈으로 시작/끝 불가
@@ -424,7 +424,7 @@ defmodule Core.Agent.SkillRegistry do
 
   defp validate_name(_, _), do: {:error, "name must be a string"}
 
-  # Description 검증 (1-1024자)
+  # 설명 검증 (1-1024자)
   defp validate_description(nil), do: {:error, "description is required in frontmatter"}
 
   defp validate_description(desc) when is_binary(desc) do
@@ -439,7 +439,7 @@ defmodule Core.Agent.SkillRegistry do
 
   defp validate_description(_), do: {:error, "description must be a string"}
 
-  # Compatibility 검증 (선택, 최대 500자)
+  # 호환성 검증 (선택, 최대 500자)
   defp validate_compatibility(nil), do: :ok
 
   defp validate_compatibility(compat) when is_binary(compat) do

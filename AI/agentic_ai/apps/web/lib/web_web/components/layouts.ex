@@ -1,22 +1,19 @@
 defmodule WebWeb.Layouts do
   @moduledoc """
-  This module holds layouts and related functionality
-  used by your application.
+  애플리케이션에서 사용하는 레이아웃과 관련 기능을 보관하는 모듈입니다.
   """
   use WebWeb, :html
 
-  # Embed all files in layouts/* within this module.
-  # The default root.html.heex file contains the HTML
-  # skeleton of your application, namely HTML headers
-  # and other static content.
+  # layouts/* 내의 모든 파일을 이 모듈에 임베드합니다.
+  # 기본 root.html.heex 파일은 HTML 헤더 및 기타 정적 콘텐츠 등
+  # 애플리케이션의 HTML 골격을 포함합니다.
   embed_templates "layouts/*"
 
   @doc """
-  Renders your app layout.
+  앱 레이아웃을 렌더링합니다.
 
-  This function is typically invoked from every template,
-  and it often contains your application menu, sidebar,
-  or similar.
+  이 함수는 일반적으로 모든 템플릿에서 호출되며,
+  애플리케이션 메뉴, 사이드바 등을 포함하는 경우가 많습니다.
 
   ## Examples
 
@@ -73,7 +70,7 @@ defmodule WebWeb.Layouts do
   end
 
   @doc """
-  Shows the flash group with standard titles and content.
+  표준 제목과 콘텐츠가 있는 플래시 그룹을 표시합니다.
 
   ## Examples
 
@@ -116,9 +113,9 @@ defmodule WebWeb.Layouts do
   end
 
   @doc """
-  Provides dark vs light theme toggle based on themes defined in app.css.
+  app.css에 정의된 테마 기반의 다크/라이트 테마 토글을 제공합니다.
 
-  See <head> in root.html.heex which applies the theme before page load.
+  페이지 로드 전에 테마를 적용하는 root.html.heex의 <head>를 참조하세요.
   """
   def theme_toggle(assigns) do
     ~H"""

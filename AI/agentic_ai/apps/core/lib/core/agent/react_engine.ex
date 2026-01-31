@@ -63,7 +63,7 @@ defmodule Core.Agent.ReactEngine do
     agent_loop(messages_with_system, tools, 0, max_iterations)
   end
 
-  # Private functions
+  # 비공개 함수들
 
   defp agent_loop(_messages, _tools, iteration, max_iterations)
        when iteration >= max_iterations do
@@ -77,7 +77,7 @@ defmodule Core.Agent.ReactEngine do
 
     case AzureOpenAI.chat_completion(formatted_messages, tools: formatted_tools) do
       {:ok, %{tool_calls: nil, content: content}} ->
-        # No tool calls - 최종 응답
+        # 도구 호출 없음 - 최종 응답 반환
         assistant_message = %{
           role: "assistant",
           content: content,
@@ -88,7 +88,7 @@ defmodule Core.Agent.ReactEngine do
         {:ok, content, messages ++ [assistant_message]}
 
       {:ok, %{tool_calls: tool_calls, content: content}} when is_list(tool_calls) ->
-        # Tool calls present - 도구 실행 후 루프 계속
+        # 도구 호출 존재 - 도구 실행 후 루프 계속
         assistant_message = %{
           role: "assistant",
           content: content || "",

@@ -168,7 +168,7 @@ defmodule Core.Contexts.Mcps do
 
   defp extract_env_var_name(_), do: nil
 
-  # Private functions
+  # 비공개 함수들
 
   defp read_mcp_config do
     path = mcp_config_path()

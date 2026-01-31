@@ -81,7 +81,7 @@ defmodule Core.MCP.Prompts do
     {:error, Protocol.invalid_params_error("Missing required parameter: name")}
   end
 
-  # Private Functions
+  # 비공개 함수들
 
   defp convert_to_mcp_prompt(skill) do
     %{

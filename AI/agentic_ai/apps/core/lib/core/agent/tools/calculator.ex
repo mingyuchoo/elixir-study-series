@@ -1,6 +1,6 @@
 defmodule Core.Agent.Tools.Calculator do
   @moduledoc """
-  Calculator tool for mathematical operations.
+  수학 연산을 위한 계산기 도구.
   """
 
   def definition("calculate") do
@@ -39,7 +39,7 @@ defmodule Core.Agent.Tools.Calculator do
   end
 
   defp evaluate(expression) do
-    # Sanitize and parse the expression
+    # 수식 정제 및 파싱
     sanitized =
       expression
       |> String.replace("sqrt", ":math.sqrt")
@@ -51,7 +51,7 @@ defmodule Core.Agent.Tools.Calculator do
       |> String.replace("abs", "Kernel.abs")
       |> String.replace("^", "**")
 
-    # Only allow safe characters
+    # 안전한 문자만 허용
     if Regex.match?(~r/^[\d\s\+\-\*\/\(\)\.\,\:\w]+$/, sanitized) do
       try do
         {result, _} = Code.eval_string(sanitized)

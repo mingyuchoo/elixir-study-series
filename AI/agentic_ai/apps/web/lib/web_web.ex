@@ -1,20 +1,18 @@
 defmodule WebWeb do
   @moduledoc """
-  The entrypoint for defining your web interface, such
-  as controllers, components, channels, and so on.
+  컨트롤러, 컴포넌트, 채널 등 웹 인터페이스를 정의하기 위한
+  진입점 모듈입니다.
 
-  This can be used in your application as:
+  애플리케이션에서 다음과 같이 사용할 수 있습니다:
 
       use WebWeb, :controller
       use WebWeb, :html
 
-  The definitions below will be executed for every controller,
-  component, etc, so keep them short and clean, focused
-  on imports, uses and aliases.
+  아래 정의들은 모든 컨트롤러, 컴포넌트 등에서 실행되므로,
+  imports, uses, aliases에만 집중하여 짧고 깔끔하게 유지하세요.
 
-  Do NOT define functions inside the quoted expressions
-  below. Instead, define additional modules and import
-  those modules here.
+  아래 quoted 표현식 내에 함수를 정의하지 마세요.
+  대신 추가 모듈을 정의하고 여기서 import 하세요.
   """
 
   def static_paths, do: ~w(assets fonts images favicon.ico robots.txt)
@@ -23,7 +21,7 @@ defmodule WebWeb do
     quote do
       use Phoenix.Router, helpers: false
 
-      # Import common connection and controller functions to use in pipelines
+      # 파이프라인에서 사용할 공통 연결 및 컨트롤러 함수 import
       import Plug.Conn
       import Phoenix.Controller
       import Phoenix.LiveView.Router
@@ -66,27 +64,27 @@ defmodule WebWeb do
     quote do
       use Phoenix.Component
 
-      # Import convenience functions from controllers
+      # 컨트롤러에서 편의 함수 import
       import Phoenix.Controller,
         only: [get_csrf_token: 0, view_module: 1, view_template: 1]
 
-      # Include general helpers for rendering HTML
+      # HTML 렌더링을 위한 일반 헬퍼 포함
       unquote(html_helpers())
     end
   end
 
   defp html_helpers do
     quote do
-      # HTML escaping functionality
+      # HTML 이스케이프 기능
       import Phoenix.HTML
-      # Core UI components
+      # 핵심 UI 컴포넌트
       import WebWeb.CoreComponents
 
-      # Common modules used in templates
+      # 템플릿에서 사용하는 공통 모듈
       alias Phoenix.LiveView.JS
       alias WebWeb.Layouts
 
-      # Routes generation with the ~p sigil
+      # ~p 시길을 사용한 라우트 생성
       unquote(verified_routes())
     end
   end
@@ -101,7 +99,7 @@ defmodule WebWeb do
   end
 
   @doc """
-  When used, dispatch to the appropriate controller/live_view/etc.
+  사용될 때 적절한 controller/live_view/etc로 디스패치합니다.
   """
   defmacro __using__(which) when is_atom(which) do
     apply(__MODULE__, which, [])

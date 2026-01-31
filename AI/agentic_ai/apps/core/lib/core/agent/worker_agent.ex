@@ -16,7 +16,7 @@ defmodule Core.Agent.WorkerAgent do
 
   defstruct [:agent_id, :agent, :tools, :current_task]
 
-  # Client API
+  # 클라이언트 API
 
   @doc """
   WorkerAgent 프로세스를 시작합니다.
@@ -50,7 +50,7 @@ defmodule Core.Agent.WorkerAgent do
     GenServer.call(worker_pid, {:execute_task, task_attrs}, 120_000)
   end
 
-  # Server callbacks
+  # 서버 콜백
 
   @impl true
   def init(agent_id) do
@@ -80,27 +80,27 @@ defmodule Core.Agent.WorkerAgent do
   def handle_call({:execute_task, task_attrs}, _from, state) do
     Logger.info("WorkerAgent #{state.agent.name} received task: #{inspect(task_attrs)}")
 
-    # Create AgentTask record
+    # AgentTask 레코드 생성
     {:ok, agent_task} = create_agent_task(state, task_attrs)
     state = %{state | current_task: agent_task}
 
-    # Update task status to in_progress
+    # 작업 상태를 진행 중으로 업데이트
     {:ok, agent_task} =
       agent_task
       |> AgentTask.changeset(%{status: :in_progress, started_at: DateTime.utc_now()})
       |> Repo.update()
 
-    # Execute task using ReactEngine
+    # ReactEngine을 사용하여 작업 실행
     case run_task(state, task_attrs) do
       {:ok, result} ->
-        # Update task status to completed
+        # 작업 상태를 완료로 업데이트
         {:ok, _agent_task} = update_task_status(agent_task, :completed, result)
 
         state = %{state | current_task: nil}
         {:reply, {:ok, result}, state}
 
       {:error, reason} = error ->
-        # Update task status to failed
+        # 작업 상태를 실패로 업데이트
         {:ok, _agent_task} = update_task_status(agent_task, :failed, reason)
 
         state = %{state | current_task: nil}
@@ -108,7 +108,7 @@ defmodule Core.Agent.WorkerAgent do
     end
   end
 
-  # Private functions
+  # 비공개 함수들
 
   defp load_enabled_tools(%Agent{enabled_tools: enabled_tool_names}) do
     all_tools = ToolRegistry.get_tools()
@@ -172,13 +172,13 @@ defmodule Core.Agent.WorkerAgent do
     user_request = task_attrs[:user_request]
     context = task_attrs[:context]
 
-    # Build initial messages
+    # 초기 메시지 구성
     messages = build_initial_messages(user_request, context)
 
-    # Build system prompt with skills
+    # 스킬이 포함된 시스템 프롬프트 구성
     system_prompt = build_system_prompt_with_skills(state.agent)
 
-    # Run ReactEngine
+    # ReactEngine 실행
     opts = [
       system_prompt: system_prompt,
       max_iterations: state.agent.max_iterations || 10
@@ -195,13 +195,13 @@ defmodule Core.Agent.WorkerAgent do
   end
 
   defp build_system_prompt_with_skills(agent) do
-    # Get available skills based on agent's enabled tools
+    # 에이전트의 활성화된 도구 기반으로 사용 가능한 스킬 가져오기
     available_skills = SkillRegistry.get_available_skills(agent.enabled_tools)
 
-    # Build skill prompt section
+    # 스킬 프롬프트 섹션 구성
     skill_prompt = SkillRegistry.build_skill_prompt(available_skills)
 
-    # Combine base system prompt with skill knowledge
+    # 기본 시스템 프롬프트와 스킬 지식 결합
     if skill_prompt == "" do
       agent.system_prompt
     else

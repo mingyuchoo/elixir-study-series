@@ -51,7 +51,7 @@ defmodule Core.Agent.MemoryManager do
       expires_at: Keyword.get(opts, :expires_at)
     }
 
-    # Upsert: update if exists, insert if not
+    # Upsert: 존재하면 업데이트, 없으면 삽입
     case get_memory(agent_id, memory_type, key) do
       nil ->
         %AgentMemory{}
@@ -118,7 +118,7 @@ defmodule Core.Agent.MemoryManager do
         query
       end
 
-    # Filter out expired memories
+    # 만료된 메모리 필터링
     query = from(m in query, where: is_nil(m.expires_at) or m.expires_at > ^DateTime.utc_now())
 
     Repo.all(query)
@@ -203,7 +203,7 @@ defmodule Core.Agent.MemoryManager do
     end
   end
 
-  # Private functions
+  # 비공개 함수들
 
   defp get_memory(agent_id, memory_type, key) do
     Repo.get_by(AgentMemory, agent_id: agent_id, memory_type: memory_type, key: key)
@@ -267,8 +267,8 @@ defmodule Core.Agent.MemoryManager do
   defp format_value(value), do: inspect(value)
 
   defp parse_and_import_markdown(agent_id, content) do
-    # Simple parser: extract sections and create memories
-    # This is a basic implementation - can be enhanced later
+    # 간단한 파서: 섹션을 추출하고 메모리 생성
+    # 기본 구현 - 추후 개선 가능
 
     sections = %{
       "Conversation Summaries" => :conversation_summary,
@@ -300,11 +300,11 @@ defmodule Core.Agent.MemoryManager do
   end
 
   defp parse_section_entries(agent_id, memory_type, section_content) do
-    # Extract entries by ### headers
+    # ### 헤더로 항목 추출
     entries = Regex.scan(~r/### (.+?)\n\n(.*?)(?=\n### |\z)/s, section_content)
 
     Enum.map(entries, fn [_, key, value_text] ->
-      # Simple value parsing - just store as text for now
+      # 간단한 값 파싱 - 일단 텍스트로 저장
       value = %{content: String.trim(value_text)}
 
       case store(agent_id, memory_type, String.trim(key), value) do

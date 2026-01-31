@@ -1,12 +1,12 @@
 defmodule Core do
   @moduledoc """
-  Documentation for `Core`.
+  `Core` 모듈에 대한 문서입니다.
   """
 
   @doc """
-  Hello world.
+  Hello world 예제 함수.
 
-  ## Examples
+  ## 예제
 
       iex> Core.hello()
       :world

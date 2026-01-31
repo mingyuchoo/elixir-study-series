@@ -1,29 +1,28 @@
 defmodule WebWeb.CoreComponents do
   @moduledoc """
-  Provides core UI components.
+  핵심 UI 컴포넌트를 제공합니다.
 
-  At first glance, this module may seem daunting, but its goal is to provide
-  core building blocks for your application, such as tables, forms, and
-  inputs. The components consist mostly of markup and are well-documented
-  with doc strings and declarative assigns. You may customize and style
-  them in any way you want, based on your application growth and needs.
+  처음 보면 이 모듈이 복잡해 보일 수 있지만, 목표는 테이블, 폼, 인풋 등
+  애플리케이션을 위한 핵심 구성 요소를 제공하는 것입니다. 컴포넌트들은
+  대부분 마크업으로 구성되어 있으며, doc 문자열과 선언적 assigns로
+  잘 문서화되어 있습니다. 애플리케이션의 성장과 필요에 따라 원하는 대로
+  커스터마이징하고 스타일링할 수 있습니다.
 
-  The foundation for styling is Tailwind CSS, a utility-first CSS framework,
-  augmented with daisyUI, a Tailwind CSS plugin that provides UI components
-  and themes. Here are useful references:
+  스타일링의 기반은 유틸리티 우선 CSS 프레임워크인 Tailwind CSS이며,
+  UI 컴포넌트와 테마를 제공하는 Tailwind CSS 플러그인 daisyUI로
+  보강되어 있습니다. 유용한 참고 자료:
 
-    * [daisyUI](https://daisyui.com/docs/intro/) - a good place to get
-      started and see the available components.
+    * [daisyUI](https://daisyui.com/docs/intro/) - 시작하기 좋은 곳이며
+      사용 가능한 컴포넌트를 확인할 수 있습니다.
 
-    * [Tailwind CSS](https://tailwindcss.com) - the foundational framework
-      we build on. You will use it for layout, sizing, flexbox, grid, and
-      spacing.
+    * [Tailwind CSS](https://tailwindcss.com) - 기반이 되는 프레임워크입니다.
+      레이아웃, 크기 조정, flexbox, grid, 간격에 사용합니다.
 
-    * [Heroicons](https://heroicons.com) - see `icon/1` for usage.
+    * [Heroicons](https://heroicons.com) - 사용법은 `icon/1` 참조.
 
     * [Phoenix.Component](https://hexdocs.pm/phoenix_live_view/Phoenix.Component.html) -
-      the component system used by Phoenix. Some components, such as `<.link>`
-      and `<.form>`, are defined there.
+      Phoenix에서 사용하는 컴포넌트 시스템입니다. `<.link>`, `<.form>` 같은
+      일부 컴포넌트는 여기에 정의되어 있습니다.
 
   """
   use Phoenix.Component
@@ -31,7 +30,7 @@ defmodule WebWeb.CoreComponents do
   alias Phoenix.LiveView.JS
 
   @doc """
-  Renders flash notices.
+  플래시 알림을 렌더링합니다.
 
   ## Examples
 
@@ -79,7 +78,7 @@ defmodule WebWeb.CoreComponents do
   end
 
   @doc """
-  Renders a button with navigation support.
+  네비게이션을 지원하는 버튼을 렌더링합니다.
 
   ## Examples
 
@@ -116,25 +115,24 @@ defmodule WebWeb.CoreComponents do
   end
 
   @doc """
-  Renders an input with label and error messages.
+  레이블과 오류 메시지가 있는 인풋을 렌더링합니다.
 
-  A `Phoenix.HTML.FormField` may be passed as argument,
-  which is used to retrieve the input name, id, and values.
-  Otherwise all attributes may be passed explicitly.
+  `Phoenix.HTML.FormField`를 인자로 전달할 수 있으며,
+  이는 인풋 name, id, values를 가져오는 데 사용됩니다.
+  그렇지 않으면 모든 속성을 명시적으로 전달할 수 있습니다.
 
   ## Types
 
-  This function accepts all HTML input types, considering that:
+  이 함수는 모든 HTML 인풋 타입을 수용하며, 다음 사항을 고려합니다:
 
-    * You may also set `type="select"` to render a `<select>` tag
+    * `<select>` 태그를 렌더링하려면 `type="select"`를 설정할 수 있습니다.
 
-    * `type="checkbox"` is used exclusively to render boolean values
+    * `type="checkbox"`는 불리언 값을 렌더링하는 데만 사용됩니다.
 
-    * For live file uploads, see `Phoenix.Component.live_file_input/1`
+    * 실시간 파일 업로드는 `Phoenix.Component.live_file_input/1` 참조
 
-  See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input
-  for more information. Unsupported types, such as radio, are best
-  written directly in your templates.
+  자세한 내용은 https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input
+  참조. radio 같은 지원되지 않는 타입은 템플릿에 직접 작성하는 것이 좋습니다.
 
   ## Examples
 
@@ -145,15 +143,15 @@ defmodule WebWeb.CoreComponents do
 
   ## Select type
 
-  When using `type="select"`, you must pass the `options` and optionally
-  a `value` to mark which option should be preselected.
+  `type="select"` 사용 시, `options`를 전달해야 하며, 선택적으로
+  어떤 옵션을 미리 선택할지 표시하는 `value`를 전달할 수 있습니다.
 
   ```heex
   <.input field={@form[:user_type]} type="select" options={["Admin": "admin", "User": "user"]} />
   ```
 
-  For more information on what kind of data can be passed to `options` see
-  [`options_for_select`](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html#options_for_select/2).
+  `options`에 전달할 수 있는 데이터 종류에 대한 자세한 내용은
+  [`options_for_select`](https://hexdocs.pm/phoenix_html/Phoenix.HTML.Form.html#options_for_select/2) 참조.
   """
   attr :id, :any, default: nil
   attr :name, :any
@@ -271,7 +269,7 @@ defmodule WebWeb.CoreComponents do
     """
   end
 
-  # All other inputs text, datetime-local, url, password, etc. are handled here...
+  # 기타 모든 인풋(text, datetime-local, url, password 등)은 여기서 처리됩니다...
   def input(assigns) do
     ~H"""
     <div class="fieldset mb-2">
@@ -294,7 +292,7 @@ defmodule WebWeb.CoreComponents do
     """
   end
 
-  # Helper used by inputs to generate form errors
+  # 인풋에서 폼 오류를 생성하는 데 사용하는 헬퍼
   defp error(assigns) do
     ~H"""
     <p class="mt-1.5 flex gap-2 items-center text-sm text-error">
@@ -305,7 +303,7 @@ defmodule WebWeb.CoreComponents do
   end
 
   @doc """
-  Renders a header with title.
+  제목이 있는 헤더를 렌더링합니다.
   """
   slot :inner_block, required: true
   slot :subtitle
@@ -328,7 +326,7 @@ defmodule WebWeb.CoreComponents do
   end
 
   @doc """
-  Renders a table with generic styling.
+  일반적인 스타일링이 적용된 테이블을 렌더링합니다.
 
   ## Examples
 
@@ -391,7 +389,7 @@ defmodule WebWeb.CoreComponents do
   end
 
   @doc """
-  Renders a data list.
+  데이터 목록을 렌더링합니다.
 
   ## Examples
 
@@ -418,17 +416,17 @@ defmodule WebWeb.CoreComponents do
   end
 
   @doc """
-  Renders a [Heroicon](https://heroicons.com).
+  [Heroicon](https://heroicons.com)을 렌더링합니다.
 
-  Heroicons come in three styles – outline, solid, and mini.
-  By default, the outline style is used, but solid and mini may
-  be applied by using the `-solid` and `-mini` suffix.
+  Heroicons는 outline, solid, mini 세 가지 스타일이 있습니다.
+  기본적으로 outline 스타일이 사용되지만, `-solid`와 `-mini`
+  접미사를 사용하여 solid와 mini를 적용할 수 있습니다.
 
-  You can customize the size and colors of the icons by setting
-  width, height, and background color classes.
+  width, height, 배경색 클래스를 설정하여 아이콘의 크기와 색상을
+  커스터마이징할 수 있습니다.
 
-  Icons are extracted from the `deps/heroicons` directory and bundled within
-  your compiled app.css by the plugin in `assets/vendor/heroicons.js`.
+  아이콘은 `deps/heroicons` 디렉토리에서 추출되어 `assets/vendor/heroicons.js`
+  플러그인에 의해 컴파일된 app.css 내에 번들됩니다.
 
   ## Examples
 
@@ -444,7 +442,7 @@ defmodule WebWeb.CoreComponents do
     """
   end
 
-  ## JS Commands
+  ## JS 명령어
 
   def show(js \\ %JS{}, selector) do
     JS.show(js,
@@ -468,11 +466,11 @@ defmodule WebWeb.CoreComponents do
   end
 
   @doc """
-  Translates an error message using gettext.
+  gettext을 사용하여 오류 메시지를 번역합니다.
   """
   def translate_error({msg, opts}) do
-    # You can make use of gettext to translate error messages by
-    # uncommenting and adjusting the following code:
+    # 아래 코드의 주석을 해제하고 조정하여 gettext을 사용해
+    # 오류 메시지를 번역할 수 있습니다:
 
     # if count = opts[:count] do
     #   Gettext.dngettext(WebWeb.Gettext, "errors", msg, msg, count, opts)
@@ -486,7 +484,7 @@ defmodule WebWeb.CoreComponents do
   end
 
   @doc """
-  Translates the errors for a field from a keyword list of errors.
+  키워드 리스트의 오류에서 필드에 대한 오류를 번역합니다.
   """
   def translate_errors(errors, field) when is_list(errors) do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})

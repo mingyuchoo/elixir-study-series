@@ -46,16 +46,16 @@ defmodule Core.Agent.Coordinator do
 
     Logger.info("Coordinator: Supervisor #{supervisor_id} sending task to Worker #{worker_id}")
 
-    # Record interaction - task delegation
+    # 상호작용 기록 - 작업 위임
     {:ok, interaction} =
       create_interaction(supervisor_id, worker_id, conversation_id, :task_delegation, %{
         user_request: user_request
       })
 
-    # Execute task on worker
+    # Worker에서 작업 실행
     case WorkerAgent.execute_task(worker_pid, task_attrs) do
       {:ok, result} ->
-        # Update interaction content with result (keep task_delegation type)
+        # 상호작용 내용에 결과 추가 (작업 위임 타입 유지)
         add_result_to_interaction(interaction, %{
           status: "completed",
           result: result
@@ -64,7 +64,7 @@ defmodule Core.Agent.Coordinator do
         {:ok, result}
 
       {:error, reason} = error ->
-        # Update interaction content with error (keep task_delegation type)
+        # 상호작용 내용에 오류 추가 (작업 위임 타입 유지)
         add_result_to_interaction(interaction, %{
           status: "failed",
           error: inspect(reason)
@@ -131,7 +131,7 @@ defmodule Core.Agent.Coordinator do
     |> Repo.all()
   end
 
-  # Private functions
+  # 비공개 함수들
 
   defp create_interaction(
          from_agent_id,

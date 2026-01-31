@@ -1,6 +1,6 @@
 defmodule Core.Agent.Tools.WebSearch do
   @moduledoc """
-  Web search tool using DuckDuckGo instant answers API.
+  DuckDuckGo 즉석 답변 API를 사용하는 웹 검색 도구.
   """
 
   def definition("search_web") do
@@ -41,7 +41,7 @@ defmodule Core.Agent.Tools.WebSearch do
   defp parse_ddg_response(body) when is_map(body) do
     results = []
 
-    # Abstract (main answer)
+    # 요약 (메인 답변)
     results =
       if body["Abstract"] && body["Abstract"] != "" do
         [
@@ -57,7 +57,7 @@ defmodule Core.Agent.Tools.WebSearch do
         results
       end
 
-    # Related topics
+    # 관련 주제
     related =
       (body["RelatedTopics"] || [])
       |> Enum.take(5)

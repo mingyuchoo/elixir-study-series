@@ -8,7 +8,7 @@ defmodule WebWeb.ChatLive do
 
   import Ecto.Query
 
-  # Markdown rendering options
+  # Markdown 렌더링 옵션
   @earmark_options %Earmark.Options{
     code_class_prefix: "language-",
     smartypants: false,
@@ -41,7 +41,7 @@ defmodule WebWeb.ChatLive do
     messages = list_messages(id)
     agent_usage_history = Agents.list_agent_usage_history(id)
 
-    # Start agent if not running
+    # 실행 중이 아니면 에이전트 시작
     ensure_agent_started(id)
 
     socket =
@@ -124,7 +124,7 @@ defmodule WebWeb.ChatLive do
     if input != "" and socket.assigns.current_conversation do
       conversation_id = socket.assigns.current_conversation.id
 
-      # Update UI immediately
+      # UI 즉시 업데이트
       user_message = %{
         id: Ecto.UUID.generate(),
         role: :user,
@@ -138,7 +138,7 @@ defmodule WebWeb.ChatLive do
         |> assign(:input, "")
         |> assign(:loading, true)
 
-      # Send to agent asynchronously
+      # 에이전트에게 비동기로 전송
       send(self(), {:process_message, conversation_id, input})
 
       {:noreply, socket}
@@ -158,7 +158,7 @@ defmodule WebWeb.ChatLive do
           inserted_at: DateTime.utc_now()
         }
 
-        # Reload agent usage history after processing
+        # 처리 후 에이전트 사용 이력 리로드
         agent_usage_history = Agents.list_agent_usage_history(conversation_id)
 
         socket =
@@ -179,7 +179,7 @@ defmodule WebWeb.ChatLive do
     end
   end
 
-  # Private functions
+  # 비공개 함수들
 
   defp list_conversations do
     Conversation
@@ -198,10 +198,10 @@ defmodule WebWeb.ChatLive do
   defp ensure_agent_started(conversation_id) do
     case Registry.lookup(Core.Agent.Registry, {:supervisor, conversation_id}) do
       [] ->
-        # Get active supervisor agent
+        # 활성화된 supervisor 에이전트 가져오기
         case Agents.get_active_supervisor() do
           nil ->
-            # Fallback: no supervisor configured
+            # 폴백: supervisor가 설정되지 않음
             :ok
 
           supervisor ->
@@ -473,7 +473,7 @@ defmodule WebWeb.ChatLive do
     end)
   end
 
-  # Markdown to HTML rendering
+  # Markdown을 HTML로 렌더링
   defp render_markdown(nil), do: Phoenix.HTML.raw("")
 
   defp render_markdown(content) when is_binary(content) do
@@ -484,7 +484,7 @@ defmodule WebWeb.ChatLive do
 
   defp render_markdown(_), do: Phoenix.HTML.raw("")
 
-  # MCP 상태 신호등 스타일
+  # MCP 상태 표시기 스타일
   defp mcp_status_indicator_class(status) do
     base = "flex items-center justify-center w-5 h-5 rounded-full"
 

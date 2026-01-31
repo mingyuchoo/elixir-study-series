@@ -1,9 +1,9 @@
-# This file is responsible for configuring your umbrella
-# and **all applications** and their dependencies with the
-# having access to Azure OpenAI API.
+# 이 파일은 umbrella 프로젝트와 **모든 애플리케이션** 및
+# 해당 의존성을 설정하는 역할을 합니다.
+# Azure OpenAI API 접근 권한을 포함합니다.
 import Config
 
-# Core app configuration
+# Core 앱 설정
 config :core,
   ecto_repos: [Core.Repo]
 
@@ -12,14 +12,14 @@ config :core, Core.Repo,
   pool_size: 5,
   show_sensitive_data_on_connection_error: true
 
-# Azure OpenAI Configuration
+# Azure OpenAI 설정
 config :core,
   azure_openai_endpoint: System.get_env("AZURE_OPENAI_ENDPOINT"),
   azure_openai_api_key: System.get_env("AZURE_OPENAI_API_KEY"),
   azure_openai_api_version: System.get_env("AZURE_OPENAI_API_VERSION", "2024-12-01-preview"),
   workspace_dir: Path.expand("../workspace", __DIR__)
 
-# Web app configuration
+# Web 앱 설정
 config :web,
   generators: [context_app: :core]
 
@@ -33,15 +33,15 @@ config :web, WebWeb.Endpoint,
   pubsub_server: Web.PubSub,
   live_view: [signing_salt: "agentic_ai_secret"]
 
-# Logger configuration
+# 로거 설정
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
-# JSON library
+# JSON 라이브러리
 config :phoenix, :json_library, Jason
 
-# Configure esbuild (the version is required)
+# esbuild 설정 (버전 필수)
 config :esbuild,
   version: "0.25.0",
   web: [
@@ -51,7 +51,7 @@ config :esbuild,
     env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
   ]
 
-# Configure tailwind (the version is required)
+# tailwind 설정 (버전 필수)
 config :tailwind,
   version: "3.4.17",
   web: [
@@ -63,5 +63,5 @@ config :tailwind,
     cd: Path.expand("../apps/web/assets", __DIR__)
   ]
 
-# Import environment specific config
+# 환경별 설정 파일 import
 import_config "#{config_env()}.exs"

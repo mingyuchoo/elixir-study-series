@@ -1,7 +1,7 @@
 defmodule Core.Agent.Tools.FileSystem do
   @moduledoc """
-  File system tools for reading, writing, and listing files.
-  Restricted to a safe workspace directory.
+  파일 읽기, 쓰기, 목록 조회를 위한 파일 시스템 도구.
+  안전한 작업 디렉토리로 제한됩니다.
   """
 
   @workspace_dir Application.compile_env(:core, :workspace_dir, "/tmp/agentic_workspace")
@@ -82,7 +82,7 @@ defmodule Core.Agent.Tools.FileSystem do
   def execute("write_file", %{"path" => path, "content" => content}) do
     full_path = safe_path(path)
 
-    # Ensure directory exists
+    # 디렉토리 존재 확인
     full_path |> Path.dirname() |> File.mkdir_p!()
 
     case File.write(full_path, content) do
@@ -121,7 +121,7 @@ defmodule Core.Agent.Tools.FileSystem do
   end
 
   defp safe_path(path) do
-    # Prevent path traversal
+    # 경로 탐색 공격 방지
     clean_path =
       path
       |> Path.expand()

@@ -73,7 +73,7 @@ defmodule Core.MCP.Tools do
     {:error, Protocol.invalid_params_error("Missing required parameter: name")}
   end
 
-  # Private Functions
+  # 비공개 함수들
 
   defp convert_to_mcp_format(tool_definition) when is_map(tool_definition) do
     # 도구 정의를 MCP 형식으로 변환
@@ -101,7 +101,7 @@ defmodule Core.MCP.Tools do
 
   defp get_tool_parameters(tool) do
     params = tool[:parameters] || tool["parameters"] || tool["function"]["parameters"] || %{}
-    # atom 키를 string 키로 변환
+    # atom 키를 문자열 키로 변환
     stringify_keys(params)
   end
 

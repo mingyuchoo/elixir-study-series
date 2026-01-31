@@ -119,6 +119,7 @@ defmodule Core.Agent.ConfigLoader do
     end)
   end
 
+  # 비공개 함수들
   # 값을 적절한 타입으로 변환
   defp parse_value(value) do
     cond do
@@ -139,7 +140,7 @@ defmodule Core.Agent.ConfigLoader do
       "enabled_tools" => []
     }
 
-    # ## 헤딩으로 섹션 분할
+    # ## 헤딩으로 섹션 분리
     parts = Regex.split(~r/^## /m, body, trim: true)
 
     Enum.reduce(parts, sections, fn part, acc ->

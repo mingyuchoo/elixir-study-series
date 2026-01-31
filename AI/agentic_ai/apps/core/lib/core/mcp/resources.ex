@@ -111,7 +111,7 @@ defmodule Core.MCP.Resources do
     {:error, Protocol.invalid_params_error("Missing required parameter: uri")}
   end
 
-  # Private Functions - Listing
+  # 비공개 함수들 - 목록 조회
 
   defp list_agent_resources do
     case File.ls(agents_dir()) do
@@ -187,7 +187,7 @@ defmodule Core.MCP.Resources do
     end
   end
 
-  # Private Functions - Reading
+  # 비공개 함수들 - 읽기
 
   defp read_agent_resource(type, name, uri) do
     filename = "#{type}_#{name}.md"
@@ -311,7 +311,7 @@ defmodule Core.MCP.Resources do
     end
   end
 
-  # Private Functions - URI Parsing
+  # 비공개 함수들 - URI 파싱
 
   defp parse_uri("agent://" <> rest) do
     case String.split(rest, "/", parts: 2) do

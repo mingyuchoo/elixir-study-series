@@ -23,11 +23,11 @@ defmodule WebWeb.Router do
     live "/chat/:id", ChatLive, :show
   end
 
-  # API routes
+  # API 라우트
   scope "/api", WebWeb do
     pipe_through :api
 
-    # Health check
+    # 헬스 체크
     get "/health", HealthController, :index
   end
 end

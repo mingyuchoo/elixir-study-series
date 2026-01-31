@@ -5,7 +5,7 @@ defmodule Core.MCP.Protocol do
   JSON-RPC 2.0 표준 에러 코드와 메시지 빌더를 제공합니다.
   """
 
-  # 표준 JSON-RPC 2.0 에러 코드
+  # JSON-RPC 2.0 표준 에러 코드
   @parse_error -32700
   @invalid_request -32600
   @method_not_found -32601

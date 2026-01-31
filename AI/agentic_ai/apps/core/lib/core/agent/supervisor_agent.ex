@@ -16,7 +16,7 @@ defmodule Core.Agent.SupervisorAgent do
 
   defstruct [:agent_id, :agent, :conversation_id, :worker_agents]
 
-  # Client API
+  # 클라이언트 API
 
   @doc """
   SupervisorAgent 프로세스를 시작합니다.
@@ -52,7 +52,7 @@ defmodule Core.Agent.SupervisorAgent do
     GenServer.call(via_tuple(conversation_id), {:chat, user_message}, 180_000)
   end
 
-  # Server callbacks
+  # 서버 콜백
 
   @impl true
   def init({agent_id, conversation_id}) do
@@ -61,10 +61,10 @@ defmodule Core.Agent.SupervisorAgent do
         {:stop, {:error, :agent_not_found}}
 
       %Agent{type: :supervisor} = agent ->
-        # Load available workers
+        # 사용 가능한 Worker 로드
         worker_agents_data = Agents.list_workers()
 
-        # Start worker processes
+        # Worker 프로세스 시작
         worker_agents = start_workers(worker_agents_data)
 
         state = %__MODULE__{
@@ -93,26 +93,26 @@ defmodule Core.Agent.SupervisorAgent do
 
     start_time = System.monotonic_time(:millisecond)
 
-    # Save user message
+    # 사용자 메시지 저장
     save_message(state.conversation_id, %{
       role: :user,
       content: user_message,
       agent_id: nil
     })
 
-    # Delegate to worker
+    # Worker에게 작업 위임
     case delegate_to_worker(state, user_message) do
       {:ok, result, worker_name} ->
         duration_ms = System.monotonic_time(:millisecond) - start_time
 
-        # Save assistant message
+        # 어시스턴트 메시지 저장
         save_message(state.conversation_id, %{
           role: :assistant,
           content: result,
           agent_id: state.agent_id
         })
 
-        # Record performance metric
+        # 성능 메트릭 기록
         record_performance_metric(state, worker_name, duration_ms, true)
 
         {:reply, {:ok, result}, state}
@@ -120,7 +120,7 @@ defmodule Core.Agent.SupervisorAgent do
       {:error, reason} = error ->
         duration_ms = System.monotonic_time(:millisecond) - start_time
 
-        # Save error message
+        # 오류 메시지 저장
         error_message = "작업 수행 중 오류가 발생했습니다: #{inspect(reason)}"
 
         save_message(state.conversation_id, %{
@@ -129,10 +129,10 @@ defmodule Core.Agent.SupervisorAgent do
           agent_id: state.agent_id
         })
 
-        # Record failure metric
+        # 실패 메트릭 기록
         record_performance_metric(state, "unknown", duration_ms, false)
 
-        # Record error pattern for learning
+        # 학습을 위한 오류 패턴 기록
         record_error_pattern(state, user_message, reason)
 
         {:reply, error, state}
@@ -143,7 +143,7 @@ defmodule Core.Agent.SupervisorAgent do
   def terminate(reason, state) do
     Logger.info("SupervisorAgent terminating: #{inspect(reason)}")
 
-    # Terminate all worker processes
+    # 모든 Worker 프로세스 종료
     Enum.each(state.worker_agents, fn {_agent, pid} ->
       if Process.alive?(pid) do
         Process.exit(pid, :shutdown)
@@ -153,7 +153,7 @@ defmodule Core.Agent.SupervisorAgent do
     :ok
   end
 
-  # Private functions
+  # 비공개 함수들
 
   defp via_tuple(conversation_id) do
     {:via, Registry, {Core.Agent.Registry, {:supervisor, conversation_id}}}
@@ -308,7 +308,7 @@ defmodule Core.Agent.SupervisorAgent do
   end
 
   defp record_performance_metric(state, worker_name, duration_ms, success) do
-    # Generate unique key based on timestamp
+    # 타임스탬프 기반 고유 키 생성
     key = "task_#{DateTime.utc_now() |> DateTime.to_unix()}"
 
     value = %{
@@ -333,7 +333,7 @@ defmodule Core.Agent.SupervisorAgent do
   end
 
   defp record_error_pattern(state, user_request, error_reason) do
-    # Create a simplified key from the error
+    # 오류에서 간단한 키 생성
     error_type = inspect(error_reason) |> String.slice(0, 50)
     key = "error_#{:erlang.phash2(error_type)}"
 
@@ -344,13 +344,13 @@ defmodule Core.Agent.SupervisorAgent do
       frequency: 1
     }
 
-    # Check if this error pattern already exists
+    # 이 오류 패턴이 이미 존재하는지 확인
     existing = MemoryManager.retrieve(state.agent_id, :learned_pattern, key: key)
 
     value =
       case existing do
         [memory | _] ->
-          # Increment frequency
+          # 빈도 증가
           old_value = memory.value
           %{value | frequency: Map.get(old_value, "frequency", 1) + 1}
 

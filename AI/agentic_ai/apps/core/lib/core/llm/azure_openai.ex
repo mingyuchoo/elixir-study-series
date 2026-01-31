@@ -1,7 +1,7 @@
 defmodule Core.LLM.AzureOpenAI do
   @moduledoc """
-  Azure OpenAI API client for chat completions.
-  Supports function calling for agentic behavior.
+  Azure OpenAI API 채팅 완성 클라이언트.
+  에이전트 동작을 위한 함수 호출(Function Calling)을 지원합니다.
   """
 
   require Logger
@@ -24,7 +24,7 @@ defmodule Core.LLM.AzureOpenAI do
     config = get_config()
     model = Keyword.get(opts, :model, @default_model)
 
-    # GPT-5-mini only supports temperature 1.0
+    # GPT-5-mini는 temperature 1.0만 지원
     default_temperature = if model == "gpt-5-mini", do: 1.0, else: 0.7
 
     body =
@@ -65,7 +65,7 @@ defmodule Core.LLM.AzureOpenAI do
     config = get_config()
     model = Keyword.get(opts, :model, @default_model)
 
-    # GPT-5-mini only supports temperature 1.0
+    # GPT-5-mini는 temperature 1.0만 지원
     default_temperature = if model == "gpt-5-mini", do: 1.0, else: 0.7
 
     body =
@@ -93,7 +93,7 @@ defmodule Core.LLM.AzureOpenAI do
     )
   end
 
-  # Private functions
+  # 비공개 함수들
 
   defp get_config do
     %{

@@ -1,8 +1,8 @@
 import Config
 
-# Runtime configuration for production
+# 프로덕션용 런타임 설정
 if config_env() == :prod do
-  # Azure OpenAI from environment
+  # 환경 변수에서 Azure OpenAI 설정 로드
   config :core,
     azure_openai_endpoint:
       System.get_env("AZURE_OPENAI_ENDPOINT") ||
@@ -12,14 +12,14 @@ if config_env() == :prod do
         raise("AZURE_OPENAI_API_KEY environment variable is not set"),
     azure_openai_api_version: System.get_env("AZURE_OPENAI_API_VERSION", "2024-10-21")
 
-  # Database
+  # 데이터베이스
   database_path =
     System.get_env("DATABASE_PATH") ||
       raise("DATABASE_PATH environment variable is not set")
 
   config :core, Core.Repo, database: database_path
 
-  # Web server
+  # 웹 서버
   host = System.get_env("PHX_HOST") || "localhost"
   port = String.to_integer(System.get_env("PORT") || "4000")
 

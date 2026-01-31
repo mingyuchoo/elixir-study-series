@@ -9,10 +9,10 @@ defmodule WebWeb.Telemetry do
   @impl true
   def init(_arg) do
     children = [
-      # Telemetry poller will execute the given period measurements
-      # every 10_000ms. Learn more here: https://hexdocs.pm/telemetry_metrics
+      # Telemetry poller는 지정된 주기 측정을 10_000ms마다 실행합니다.
+      # 자세한 내용: https://hexdocs.pm/telemetry_metrics
       {:telemetry_poller, measurements: periodic_measurements(), period: 10_000}
-      # Add reporters as children of your supervision tree.
+      # 리포터를 supervision tree의 자식으로 추가하세요.
       # {Telemetry.Metrics.ConsoleReporter, metrics: metrics()}
     ]
 
@@ -21,7 +21,7 @@ defmodule WebWeb.Telemetry do
 
   def metrics do
     [
-      # Phoenix Metrics
+      # Phoenix 메트릭
       summary("phoenix.endpoint.start.system_time",
         unit: {:native, :millisecond}
       ),
@@ -52,7 +52,7 @@ defmodule WebWeb.Telemetry do
         unit: {:native, :millisecond}
       ),
 
-      # VM Metrics
+      # VM 메트릭
       summary("vm.memory.total", unit: {:byte, :kilobyte}),
       summary("vm.total_run_queue_lengths.total"),
       summary("vm.total_run_queue_lengths.cpu"),
@@ -62,8 +62,8 @@ defmodule WebWeb.Telemetry do
 
   defp periodic_measurements do
     [
-      # A module, function and arguments to be invoked periodically.
-      # This function must call :telemetry.execute/3 and a metric must be added above.
+      # 주기적으로 호출될 모듈, 함수, 인자입니다.
+      # 이 함수는 :telemetry.execute/3을 호출해야 하며, 위에 메트릭이 추가되어야 합니다.
       # {WebWeb, :count_users, []}
     ]
   end

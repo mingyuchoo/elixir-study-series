@@ -1,9 +1,8 @@
 defmodule Web do
   @moduledoc """
-  Web keeps the contexts that define your domain
-  and business logic.
+  도메인 및 비즈니스 로직을 정의하는 컨텍스트를 관리하는 Web 모듈입니다.
 
-  Contexts are also responsible for managing your data, regardless
-  if it comes from the database, an external API or others.
+  컨텍스트는 데이터베이스, 외부 API 등 어디서 오든 상관없이
+  데이터를 관리하는 역할을 담당합니다.
   """
 end
