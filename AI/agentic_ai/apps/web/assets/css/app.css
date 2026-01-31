@@ -1,0 +1,318 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+/* This file is for your main application CSS */
+
+/* Alerts and form errors used by phx.new */
+.alert {
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+.alert-info {
+  color: #31708f;
+  background-color: #d9edf7;
+  border-color: #bce8f1;
+}
+.alert-warning {
+  color: #8a6d3b;
+  background-color: #fcf8e3;
+  border-color: #faebcc;
+}
+.alert-danger {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+}
+.alert p {
+  margin-bottom: 0;
+}
+.alert:empty {
+  display: none;
+}
+.invalid-feedback {
+  color: #a94442;
+  display: block;
+  margin: -1rem 0 2rem;
+}
+
+/* LiveView specific classes for your customizations */
+.phx-no-feedback.invalid-feedback,
+.phx-no-feedback .invalid-feedback {
+  display: none;
+}
+
+.phx-click-loading {
+  opacity: 0.5;
+  transition: opacity 1s ease-out;
+}
+
+.phx-loading {
+  cursor: wait;
+}
+
+.phx-modal {
+  opacity: 1 !important;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.phx-modal-content {
+  background-color: #fefefe;
+  margin: 15vh auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+.phx-modal-close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.phx-modal-close:hover,
+.phx-modal-close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.fade-in-scale {
+  animation: 0.2s ease-in 0s normal forwards 1 fade-in-scale-keys;
+}
+
+.fade-out-scale {
+  animation: 0.2s ease-out 0s normal forwards 1 fade-out-scale-keys;
+}
+
+.fade-in {
+  animation: 0.2s ease-out 0s normal forwards 1 fade-in-keys;
+}
+.fade-out {
+  animation: 0.2s ease-out 0s normal forwards 1 fade-out-keys;
+}
+
+@keyframes fade-in-scale-keys {
+  0% {
+    scale: 0.95;
+    opacity: 0;
+  }
+  100% {
+    scale: 1;
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out-scale-keys {
+  0% {
+    scale: 1;
+    opacity: 1;
+  }
+  100% {
+    scale: 0.95;
+    opacity: 0;
+  }
+}
+
+@keyframes fade-in-keys {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out-keys {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ========================================
+   Markdown Rendering Styles
+   ======================================== */
+
+/* Prose customization for chat messages */
+.prose {
+  --tw-prose-body: #374151;
+  --tw-prose-headings: #111827;
+  --tw-prose-links: #2563eb;
+  --tw-prose-bold: #111827;
+  --tw-prose-code: #db2777;
+  --tw-prose-pre-bg: #1f2937;
+  --tw-prose-pre-code: #f3f4f6;
+}
+
+/* Code blocks */
+.prose pre {
+  @apply rounded-lg shadow-md overflow-x-auto my-3;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.prose pre code {
+  @apply text-sm leading-relaxed;
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
+  color: #e2e8f0;
+}
+
+/* Inline code */
+.prose code:not(pre code) {
+  @apply px-1.5 py-0.5 rounded font-medium;
+  background: linear-gradient(135deg, #fce7f3 0%, #fdf2f8 100%);
+  color: #be185d;
+  font-size: 0.875em;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+.prose code:not(pre code)::before,
+.prose code:not(pre code)::after {
+  content: none;
+}
+
+/* Headings */
+.prose h1 {
+  @apply text-xl font-bold mt-6 mb-3 pb-2 border-b border-gray-200;
+  background: linear-gradient(90deg, #1e40af, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.prose h2 {
+  @apply text-lg font-semibold mt-5 mb-2;
+  color: #1e3a8a;
+}
+
+.prose h3 {
+  @apply text-base font-semibold mt-4 mb-2;
+  color: #1e40af;
+}
+
+/* Lists */
+.prose ul {
+  @apply my-2 ml-4;
+  list-style-type: none;
+}
+
+.prose ul > li {
+  @apply relative pl-5 my-1;
+}
+
+.prose ul > li::before {
+  content: '▸';
+  @apply absolute left-0 text-blue-500 font-bold;
+}
+
+.prose ol {
+  @apply my-2 ml-4;
+  counter-reset: item;
+  list-style-type: none;
+}
+
+.prose ol > li {
+  @apply relative pl-7 my-1;
+  counter-increment: item;
+}
+
+.prose ol > li::before {
+  content: counter(item);
+  @apply absolute left-0 flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-blue-500 rounded-full;
+}
+
+/* Blockquotes */
+.prose blockquote {
+  @apply my-3 pl-4 py-2 border-l-4 border-blue-500 bg-blue-50 rounded-r-lg italic;
+  quotes: none;
+}
+
+.prose blockquote p {
+  @apply text-gray-700 m-0;
+}
+
+/* Tables */
+.prose table {
+  @apply w-full my-3 border-collapse rounded-lg overflow-hidden shadow-sm;
+}
+
+.prose thead {
+  @apply bg-gradient-to-r from-gray-100 to-gray-50;
+}
+
+.prose th {
+  @apply px-4 py-2 text-left text-sm font-semibold text-gray-700 border-b-2 border-gray-200;
+}
+
+.prose td {
+  @apply px-4 py-2 text-sm text-gray-600 border-b border-gray-100;
+}
+
+.prose tbody tr:hover {
+  @apply bg-gray-50;
+}
+
+/* Links */
+.prose a {
+  @apply text-blue-600 font-medium no-underline transition-colors;
+}
+
+.prose a:hover {
+  @apply text-blue-800 underline decoration-2 decoration-blue-300;
+}
+
+/* Horizontal rules */
+.prose hr {
+  @apply my-4 border-0 h-px;
+  background: linear-gradient(90deg, transparent, #d1d5db, transparent);
+}
+
+/* Strong/Bold */
+.prose strong {
+  @apply font-bold text-gray-900;
+}
+
+/* Emphasis/Italic */
+.prose em {
+  @apply italic text-gray-700;
+}
+
+/* Paragraphs */
+.prose p {
+  @apply my-2 leading-relaxed;
+}
+
+/* Images */
+.prose img {
+  @apply rounded-lg shadow-md my-3;
+}
+
+/* Task lists (checkboxes) */
+.prose ul.contains-task-list {
+  @apply list-none pl-0;
+}
+
+.prose ul.contains-task-list li {
+  @apply pl-0;
+}
+
+.prose ul.contains-task-list li::before {
+  content: none;
+}
+
+.prose input[type="checkbox"] {
+  @apply mr-2 rounded border-gray-300;
+}
