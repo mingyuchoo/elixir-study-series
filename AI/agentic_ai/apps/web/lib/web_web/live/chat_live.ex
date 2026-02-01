@@ -3,7 +3,7 @@ defmodule WebWeb.ChatLive do
 
   alias Core.Schema.{Conversation, Message}
   alias Core.Repo
-  alias Core.Agent.{Supervisor, SupervisorAgent}
+  alias Core.Agent.{MemoryManager, Supervisor, SupervisorAgent}
   alias Core.Contexts.{Agents, Mcps}
 
   import Ecto.Query
@@ -21,6 +21,9 @@ defmodule WebWeb.ChatLive do
     available_agents = Agents.list_agents(status: :active)
     available_mcps = Mcps.list_mcps_with_status()
 
+    # 사용자 프로필 확인 (표시용)
+    user_profile = get_user_profile_for_display()
+
     socket =
       socket
       |> assign(:conversations, conversations)
@@ -31,6 +34,8 @@ defmodule WebWeb.ChatLive do
       |> assign(:available_agents, available_agents)
       |> assign(:available_mcps, available_mcps)
       |> assign(:agent_usage_history, [])
+      |> assign(:user_profile, user_profile)
+      |> assign(:message_sent_at, nil)
 
     {:ok, socket}
   end
@@ -39,16 +44,17 @@ defmodule WebWeb.ChatLive do
   def handle_params(%{"id" => id}, _uri, socket) do
     conversation = Repo.get!(Conversation, id)
     messages = list_messages(id)
-    agent_usage_history = Agents.list_agent_usage_history(id)
 
     # 실행 중이 아니면 에이전트 시작
     ensure_agent_started(id)
 
+    # 대화 선택 시 이력 초기화 (새 질문 시에만 표시)
     socket =
       socket
       |> assign(:current_conversation, conversation)
       |> assign(:messages, messages)
-      |> assign(:agent_usage_history, agent_usage_history)
+      |> assign(:agent_usage_history, [])
+      |> assign(:message_sent_at, nil)
 
     {:noreply, socket}
   end
@@ -123,13 +129,14 @@ defmodule WebWeb.ChatLive do
 
     if input != "" and socket.assigns.current_conversation do
       conversation_id = socket.assigns.current_conversation.id
+      now = DateTime.utc_now()
 
       # UI 즉시 업데이트
       user_message = %{
         id: Ecto.UUID.generate(),
         role: :user,
         content: input,
-        inserted_at: DateTime.utc_now()
+        inserted_at: now
       }
 
       socket =
@@ -137,6 +144,8 @@ defmodule WebWeb.ChatLive do
         |> assign(:messages, socket.assigns.messages ++ [user_message])
         |> assign(:input, "")
         |> assign(:loading, true)
+        |> assign(:message_sent_at, now)
+        |> assign(:agent_usage_history, [])
 
       # 에이전트에게 비동기로 전송
       send(self(), {:process_message, conversation_id, input})
@@ -158,14 +167,19 @@ defmodule WebWeb.ChatLive do
           inserted_at: DateTime.utc_now()
         }
 
-        # 처리 후 에이전트 사용 이력 리로드
-        agent_usage_history = Agents.list_agent_usage_history(conversation_id)
+        # 이번 질문에 대한 에이전트 사용 이력만 조회
+        message_sent_at = socket.assigns.message_sent_at
+        agent_usage_history = Agents.list_agent_usage_history(conversation_id, message_sent_at)
+
+        # 프로필이 업데이트되었을 수 있으므로 새로고침
+        user_profile = get_user_profile_for_display()
 
         socket =
           socket
           |> assign(:messages, socket.assigns.messages ++ [assistant_message])
           |> assign(:loading, false)
           |> assign(:agent_usage_history, agent_usage_history)
+          |> assign(:user_profile, user_profile)
 
         {:noreply, socket}
 
@@ -173,6 +187,7 @@ defmodule WebWeb.ChatLive do
         socket =
           socket
           |> assign(:loading, false)
+          |> assign(:agent_usage_history, [])
           |> put_flash(:error, "Error: #{inspect(reason)}")
 
         {:noreply, socket}
@@ -219,6 +234,29 @@ defmodule WebWeb.ChatLive do
     <div class="flex h-screen bg-gray-100">
       <!-- Sidebar -->
       <div class="w-64 bg-gray-900 text-white flex flex-col">
+        <!-- 사용자 프로필 섹션 -->
+        <%= if @user_profile do %>
+          <div class="p-4 border-b border-gray-700 bg-gradient-to-r from-blue-900 to-purple-900">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+                {String.first(@user_profile[:user_name] || @user_profile["user_name"] || "?")}
+              </div>
+              <div>
+                <div class="font-medium text-sm">
+                  {@user_profile[:user_name] || @user_profile["user_name"]}
+                </div>
+                <div class="text-xs text-gray-400 flex items-center gap-1">
+                  <.icon name="hero-map-pin" class="w-3 h-3" />
+                  {@user_profile[:city] || @user_profile["city"]}
+                </div>
+              </div>
+            </div>
+            <div class="mt-2 text-xs text-purple-300">
+              AI 비서: {@user_profile[:agent_name] || @user_profile["agent_name"]}
+            </div>
+          </div>
+        <% end %>
+
         <div class="p-4 border-b border-gray-700">
           <button
             phx-click="new_conversation"
@@ -279,7 +317,10 @@ defmodule WebWeb.ChatLive do
                     </div>
                   </div>
                   <!-- 신호등 상태 표시 -->
-                  <span class={mcp_status_indicator_class(mcp.status)} title={mcp_status_label(mcp.status)}>
+                  <span
+                    class={mcp_status_indicator_class(mcp.status)}
+                    title={mcp_status_label(mcp.status)}
+                  >
                     <span class={mcp_status_dot_class(mcp.status)}></span>
                   </span>
                 </div>
@@ -513,6 +554,27 @@ defmodule WebWeb.ChatLive do
       :unavailable -> "환경 변수 미설정"
       :unknown -> "상태 확인 불가"
       _ -> "알 수 없음"
+    end
+  end
+
+  # 사용자 프로필 조회 (표시용)
+  # AI Agent가 대화를 통해 프로필을 수집하므로 팝업 없이 표시만 함
+  defp get_user_profile_for_display do
+    case MemoryManager.get_user_profile() do
+      {:ok, profile} ->
+        # 프로필이 완전한지 확인
+        has_user_name = Map.get(profile, "user_name") || Map.get(profile, :user_name)
+        has_agent_name = Map.get(profile, "agent_name") || Map.get(profile, :agent_name)
+        has_city = Map.get(profile, "city") || Map.get(profile, :city)
+
+        if has_user_name && has_agent_name && has_city do
+          profile
+        else
+          nil
+        end
+
+      {:error, _} ->
+        nil
     end
   end
 end

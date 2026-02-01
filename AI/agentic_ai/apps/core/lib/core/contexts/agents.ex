@@ -287,12 +287,39 @@ defmodule Core.Contexts.Agents do
       ]
   """
   def list_agent_usage_history(conversation_id) do
+    list_agent_usage_history(conversation_id, nil)
+  end
+
+  @doc """
+  특정 시간 이후에 사용된 에이전트 이력만 조회합니다.
+
+  한 번의 질문에 대한 에이전트 실행 순서를 표시할 때 사용합니다.
+  `since` 파라미터가 nil이면 전체 이력을 반환합니다.
+
+  ## Parameters
+
+    - `conversation_id` - 대화 ID
+    - `since` - 이 시간 이후의 이력만 조회 (DateTime 또는 nil)
+
+  ## Examples
+
+      iex> list_agent_usage_history(conversation_id, ~U[2024-01-01 12:00:00Z])
+      [%{order: 1, agent: %Agent{}, ...}]
+  """
+  def list_agent_usage_history(conversation_id, since) do
     query =
       from(i in AgentInteraction,
         where: i.conversation_id == ^conversation_id and i.interaction_type == :task_delegation,
         order_by: [asc: i.inserted_at],
         preload: [:from_agent, :to_agent]
       )
+
+    query =
+      if since do
+        from(i in query, where: i.inserted_at >= ^since)
+      else
+        query
+      end
 
     query
     |> Repo.all()

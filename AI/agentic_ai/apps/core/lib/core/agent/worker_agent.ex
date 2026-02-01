@@ -9,7 +9,7 @@ defmodule Core.Agent.WorkerAgent do
   use GenServer
   require Logger
 
-  alias Core.Agent.{ReactEngine, ToolRegistry, SkillRegistry}
+  alias Core.Agent.{MemoryManager, ReactEngine, ToolRegistry, SkillRegistry}
   alias Core.Contexts.Agents
   alias Core.Schema.{Agent, AgentTask}
   alias Core.Repo
@@ -90,18 +90,30 @@ defmodule Core.Agent.WorkerAgent do
       |> AgentTask.changeset(%{status: :in_progress, started_at: DateTime.utc_now()})
       |> Repo.update()
 
+    start_time = System.monotonic_time(:millisecond)
+
     # ReactEngine을 사용하여 작업 실행
     case run_task(state, task_attrs) do
       {:ok, result} ->
+        duration_ms = System.monotonic_time(:millisecond) - start_time
+
         # 작업 상태를 완료로 업데이트
         {:ok, _agent_task} = update_task_status(agent_task, :completed, result)
+
+        # 성공 작업 학습 (메모리 저장)
+        record_task_execution(state, task_attrs, result, duration_ms, true)
 
         state = %{state | current_task: nil}
         {:reply, {:ok, result}, state}
 
       {:error, reason} = error ->
+        duration_ms = System.monotonic_time(:millisecond) - start_time
+
         # 작업 상태를 실패로 업데이트
         {:ok, _agent_task} = update_task_status(agent_task, :failed, reason)
+
+        # 실패 패턴 학습 (메모리 저장)
+        record_task_execution(state, task_attrs, reason, duration_ms, false)
 
         state = %{state | current_task: nil}
         {:reply, error, state}
@@ -201,17 +213,57 @@ defmodule Core.Agent.WorkerAgent do
     # 스킬 프롬프트 섹션 구성
     skill_prompt = SkillRegistry.build_skill_prompt(available_skills)
 
-    # 기본 시스템 프롬프트와 스킬 지식 결합
+    # 사용자 프로필 정보 가져오기
+    user_context = build_user_context()
+
+    # 기본 시스템 프롬프트에 사용자 컨텍스트와 스킬 지식 결합
+    base_prompt =
+      if user_context != "" do
+        """
+        #{user_context}
+
+        #{agent.system_prompt}
+        """
+      else
+        agent.system_prompt
+      end
+
     if skill_prompt == "" do
-      agent.system_prompt
+      base_prompt
     else
       """
-      #{agent.system_prompt}
+      #{base_prompt}
 
       ---
 
       #{skill_prompt}
       """
+    end
+  end
+
+  # 사용자 프로필 기반 컨텍스트 생성
+  defp build_user_context do
+    case MemoryManager.get_user_profile() do
+      {:ok, profile} ->
+        user_name = Map.get(profile, "user_name") || Map.get(profile, :user_name)
+        agent_name = Map.get(profile, "agent_name") || Map.get(profile, :agent_name)
+        city = Map.get(profile, "city") || Map.get(profile, :city)
+
+        if user_name && agent_name && city do
+          """
+          [사용자 정보]
+          - 사용자 이름: #{user_name}
+          - 당신의 이름: #{agent_name}
+          - 사용자 위치: #{city}
+
+          위 정보를 활용하여 개인화된 응답을 제공하세요. 사용자를 이름으로 부르고, 위치 기반 정보(날씨, 시간 등)를 제공할 때 활용하세요.
+          """
+        else
+          ""
+        end
+
+      {:error, _} ->
+        ""
     end
   end
 
@@ -242,5 +294,39 @@ defmodule Core.Agent.WorkerAgent do
           tool_call_id: nil
         }
       ]
+  end
+
+  # 작업 실행 결과를 메모리에 저장
+  defp record_task_execution(state, task_attrs, result_or_error, duration_ms, success) do
+    key = "task_#{DateTime.utc_now() |> DateTime.to_unix()}"
+
+    value = %{
+      worker_name: state.agent.name,
+      user_request: task_attrs[:user_request] |> String.slice(0, 200),
+      duration_ms: duration_ms,
+      success: success,
+      result_preview:
+        if success do
+          result_or_error |> String.slice(0, 100)
+        else
+          inspect(result_or_error) |> String.slice(0, 100)
+        end,
+      timestamp: DateTime.utc_now() |> DateTime.to_iso8601()
+    }
+
+    opts = [
+      conversation_id: task_attrs[:conversation_id],
+      relevance_score: if(success, do: 0.5, else: 0.7)
+    ]
+
+    memory_type = if success, do: :performance_metric, else: :learned_pattern
+
+    case MemoryManager.store(state.agent_id, memory_type, key, value, opts) do
+      {:ok, _memory} ->
+        Logger.debug("Worker #{state.agent.name} recorded #{memory_type}: #{success}")
+
+      {:error, reason} ->
+        Logger.warning("Failed to record worker memory: #{inspect(reason)}")
+    end
   end
 end

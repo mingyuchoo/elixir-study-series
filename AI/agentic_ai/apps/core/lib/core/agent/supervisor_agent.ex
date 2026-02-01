@@ -4,6 +4,7 @@ defmodule Core.Agent.SupervisorAgent do
 
   사용자 요청을 분석하고 적절한 Worker에게 작업을 전달합니다.
   Worker의 결과를 수집하여 사용자에게 응답합니다.
+  새로운 사용자의 경우 능동적으로 프로필 정보를 수집합니다.
   """
 
   use GenServer
@@ -14,7 +15,20 @@ defmodule Core.Agent.SupervisorAgent do
   alias Core.Schema.{Agent, Message}
   alias Core.Repo
 
-  defstruct [:agent_id, :agent, :conversation_id, :worker_agents]
+  # 프로필 수집 상태
+  # :idle - 프로필 수집 중이 아님
+  # :collecting_user_name - 사용자 이름 수집 중
+  # :collecting_agent_name - AI 비서 이름 수집 중
+  # :collecting_city - 도시 수집 중
+  # :complete - 프로필 수집 완료
+  defstruct [
+    :agent_id,
+    :agent,
+    :conversation_id,
+    :worker_agents,
+    profile_state: :idle,
+    partial_profile: %{}
+  ]
 
   # 클라이언트 API
 
@@ -61,17 +75,25 @@ defmodule Core.Agent.SupervisorAgent do
         {:stop, {:error, :agent_not_found}}
 
       %Agent{type: :supervisor} = agent ->
+        # Markdown에서 메모리 로드 시도
+        load_memory_from_markdown(agent_id, agent.name)
+
         # 사용 가능한 Worker 로드
         worker_agents_data = Agents.list_workers()
 
         # Worker 프로세스 시작
         worker_agents = start_workers(worker_agents_data)
 
+        # 프로필 상태 초기화
+        {profile_state, partial_profile} = init_profile_state()
+
         state = %__MODULE__{
           agent_id: agent_id,
           agent: agent,
           conversation_id: conversation_id,
-          worker_agents: worker_agents
+          worker_agents: worker_agents,
+          profile_state: profile_state,
+          partial_profile: partial_profile
         }
 
         Logger.info("SupervisorAgent started: #{agent.name} for conversation #{conversation_id}")
@@ -91,6 +113,213 @@ defmodule Core.Agent.SupervisorAgent do
   def handle_call({:chat, user_message}, _from, state) do
     Logger.info("SupervisorAgent received message: #{user_message}")
 
+    # 프로필 수집 중인지 확인
+    case state.profile_state do
+      :idle ->
+        # 프로필 완전한지 확인
+        case check_and_start_profile_collection(state) do
+          {:collecting, new_state, greeting} ->
+            # 사용자 메시지 저장
+            save_message(state.conversation_id, %{
+              role: :user,
+              content: user_message,
+              agent_id: nil
+            })
+
+            # 인사말 + 첫 질문 저장
+            save_message(state.conversation_id, %{
+              role: :assistant,
+              content: greeting,
+              agent_id: state.agent_id
+            })
+
+            {:reply, {:ok, greeting}, new_state}
+
+          {:complete, _state} ->
+            # 프로필 완료, 정상 처리
+            process_normal_message(state, user_message)
+        end
+
+      collecting_state
+      when collecting_state in [:collecting_user_name, :collecting_agent_name, :collecting_city] ->
+        # 프로필 수집 중 - 응답 처리
+        process_profile_response(state, user_message)
+
+      :complete ->
+        # 프로필 수집 완료, 정상 처리
+        process_normal_message(state, user_message)
+    end
+  end
+
+  # 프로필 완료 여부 확인 및 수집 시작
+  defp check_and_start_profile_collection(state) do
+    case MemoryManager.get_user_profile() do
+      {:ok, profile} ->
+        user_name = Map.get(profile, "user_name") || Map.get(profile, :user_name)
+        agent_name = Map.get(profile, "agent_name") || Map.get(profile, :agent_name)
+        city = Map.get(profile, "city") || Map.get(profile, :city)
+
+        cond do
+          !user_name ->
+            greeting = """
+            안녕하세요! 👋 저는 당신의 AI 비서입니다.
+
+            더 나은 서비스를 제공하기 위해 몇 가지 정보를 알고 싶어요.
+
+            먼저, **어떻게 불러드리면 될까요?** 이름이나 별명을 알려주세요.
+            """
+
+            {:collecting,
+             %{state | profile_state: :collecting_user_name, partial_profile: profile}, greeting}
+
+          !agent_name ->
+            greeting = """
+            #{user_name}님, 반가워요! 😊
+
+            저에게도 이름을 지어주실 수 있나요? **저를 뭐라고 부르고 싶으세요?**
+            (예: 아리, 제이, 클로버 등)
+            """
+
+            {:collecting,
+             %{state | profile_state: :collecting_agent_name, partial_profile: profile}, greeting}
+
+          !city ->
+            greeting = """
+            좋아요, #{user_name}님! 저는 이제 #{agent_name}(이)에요. 🎉
+
+            마지막으로, **현재 어느 도시에 계신가요?**
+            날씨나 시간 등 맞춤 정보를 제공하는 데 도움이 됩니다.
+            """
+
+            {:collecting, %{state | profile_state: :collecting_city, partial_profile: profile},
+             greeting}
+
+          true ->
+            {:complete, %{state | profile_state: :complete}}
+        end
+
+      {:error, _} ->
+        # 프로필 없음 - 처음부터 시작
+        greeting = """
+        안녕하세요! 👋 저는 당신의 AI 비서입니다.
+
+        더 나은 서비스를 제공하기 위해 몇 가지 정보를 알고 싶어요.
+
+        먼저, **어떻게 불러드리면 될까요?** 이름이나 별명을 알려주세요.
+        """
+
+        {:collecting, %{state | profile_state: :collecting_user_name, partial_profile: %{}},
+         greeting}
+    end
+  end
+
+  # 프로필 응답 처리
+  defp process_profile_response(state, user_message) do
+    # 사용자 메시지 저장
+    save_message(state.conversation_id, %{
+      role: :user,
+      content: user_message,
+      agent_id: nil
+    })
+
+    trimmed_input = String.trim(user_message)
+
+    case state.profile_state do
+      :collecting_user_name ->
+        # 사용자 이름 저장
+        new_profile = Map.put(state.partial_profile, :user_name, trimmed_input)
+        save_partial_profile(new_profile)
+
+        response = """
+        #{trimmed_input}님, 반가워요! 😊
+
+        저에게도 이름을 지어주실 수 있나요? **저를 뭐라고 부르고 싶으세요?**
+        (예: 아리, 제이, 클로버 등)
+        """
+
+        save_message(state.conversation_id, %{
+          role: :assistant,
+          content: response,
+          agent_id: state.agent_id
+        })
+
+        new_state = %{state | profile_state: :collecting_agent_name, partial_profile: new_profile}
+        {:reply, {:ok, response}, new_state}
+
+      :collecting_agent_name ->
+        # AI 비서 이름 저장
+        user_name =
+          Map.get(state.partial_profile, :user_name) ||
+            Map.get(state.partial_profile, "user_name")
+
+        new_profile = Map.put(state.partial_profile, :agent_name, trimmed_input)
+        save_partial_profile(new_profile)
+
+        response = """
+        좋아요, #{user_name}님! 저는 이제 #{trimmed_input}(이)에요. 🎉
+
+        마지막으로, **현재 어느 도시에 계신가요?**
+        날씨나 시간 등 맞춤 정보를 제공하는 데 도움이 됩니다.
+        """
+
+        save_message(state.conversation_id, %{
+          role: :assistant,
+          content: response,
+          agent_id: state.agent_id
+        })
+
+        new_state = %{state | profile_state: :collecting_city, partial_profile: new_profile}
+        {:reply, {:ok, response}, new_state}
+
+      :collecting_city ->
+        # 도시 저장 및 프로필 완료
+        user_name =
+          Map.get(state.partial_profile, :user_name) ||
+            Map.get(state.partial_profile, "user_name")
+
+        agent_name =
+          Map.get(state.partial_profile, :agent_name) ||
+            Map.get(state.partial_profile, "agent_name")
+
+        new_profile = Map.put(state.partial_profile, :city, trimmed_input)
+
+        # 완전한 프로필 저장
+        case MemoryManager.save_user_profile(new_profile) do
+          {:ok, _} ->
+            Logger.info("Profile collection completed for user: #{user_name}")
+
+          {:error, reason} ->
+            Logger.warning("Failed to save profile: #{inspect(reason)}")
+        end
+
+        response = """
+        완벽해요! 🎊
+
+        **#{user_name}**님, #{trimmed_input}에서 만나뵙게 되어 기쁩니다!
+        저 **#{agent_name}**(이)가 앞으로 최선을 다해 도와드릴게요.
+
+        무엇이든 물어보세요! 계산, 웹 검색, 날씨 등 다양한 도움을 드릴 수 있어요. 😄
+        """
+
+        save_message(state.conversation_id, %{
+          role: :assistant,
+          content: response,
+          agent_id: state.agent_id
+        })
+
+        new_state = %{state | profile_state: :complete, partial_profile: new_profile}
+        {:reply, {:ok, response}, new_state}
+    end
+  end
+
+  # 부분 프로필 저장 (MemoryManager 활용)
+  defp save_partial_profile(profile) do
+    # 임시로 부분 프로필도 저장 (빈 값이 있어도)
+    MemoryManager.save_user_profile(profile)
+  end
+
+  # 일반 메시지 처리 (기존 로직)
+  defp process_normal_message(state, user_message) do
     start_time = System.monotonic_time(:millisecond)
 
     # 사용자 메시지 저장
@@ -143,6 +372,12 @@ defmodule Core.Agent.SupervisorAgent do
   def terminate(reason, state) do
     Logger.info("SupervisorAgent terminating: #{inspect(reason)}")
 
+    # 대화 요약 저장
+    save_conversation_summary(state)
+
+    # 메모리를 Markdown 파일로 내보내기
+    export_memory_to_markdown(state.agent_id)
+
     # 모든 Worker 프로세스 종료
     Enum.each(state.worker_agents, fn {_agent, pid} ->
       if Process.alive?(pid) do
@@ -171,6 +406,25 @@ defmodule Core.Agent.SupervisorAgent do
       end
     end)
     |> Enum.filter(fn {_agent, pid} -> pid != nil end)
+  end
+
+  # 프로필 상태 초기화
+  defp init_profile_state do
+    case MemoryManager.get_user_profile() do
+      {:ok, profile} ->
+        user_name = Map.get(profile, "user_name") || Map.get(profile, :user_name)
+        agent_name = Map.get(profile, "agent_name") || Map.get(profile, :agent_name)
+        city = Map.get(profile, "city") || Map.get(profile, :city)
+
+        if user_name && agent_name && city do
+          {:complete, profile}
+        else
+          {:idle, profile}
+        end
+
+      {:error, _} ->
+        {:idle, %{}}
+    end
   end
 
   defp delegate_to_worker(state, user_request) do
@@ -370,5 +624,97 @@ defmodule Core.Agent.SupervisorAgent do
       {:error, reason} ->
         Logger.warning("Failed to record error pattern: #{inspect(reason)}")
     end
+  end
+
+  # Markdown 파일에서 메모리 로드
+  defp load_memory_from_markdown(agent_id, agent_name) do
+    memory_path = Path.join(["data/memories", agent_name, "memory.md"])
+
+    if File.exists?(memory_path) do
+      case MemoryManager.import_from_markdown(agent_id, memory_path) do
+        {:ok, memories} ->
+          Logger.info("Loaded #{length(memories)} memories from #{memory_path}")
+
+        {:error, reason} ->
+          Logger.warning("Failed to load memories from markdown: #{inspect(reason)}")
+      end
+    else
+      Logger.debug("No memory file found at #{memory_path}, starting fresh")
+    end
+  end
+
+  # 메모리를 Markdown 파일로 저장
+  defp export_memory_to_markdown(agent_id) do
+    case MemoryManager.export_to_markdown(agent_id) do
+      {:ok, path} ->
+        Logger.info("Exported memories to #{path}")
+
+      {:error, reason} ->
+        Logger.warning("Failed to export memories to markdown: #{inspect(reason)}")
+    end
+  end
+
+  # 대화 요약 저장
+  defp save_conversation_summary(state) do
+    # 대화에서 메시지 가져오기
+    messages = get_conversation_messages(state.conversation_id)
+
+    if length(messages) > 0 do
+      summary = generate_conversation_summary(messages)
+
+      key = "conversation_#{state.conversation_id}"
+
+      opts = [
+        conversation_id: state.conversation_id,
+        relevance_score: 0.8
+      ]
+
+      case MemoryManager.store(state.agent_id, :conversation_summary, key, summary, opts) do
+        {:ok, _memory} ->
+          Logger.debug("Saved conversation summary for #{state.conversation_id}")
+
+        {:error, reason} ->
+          Logger.warning("Failed to save conversation summary: #{inspect(reason)}")
+      end
+    end
+  end
+
+  # 대화 메시지 조회
+  defp get_conversation_messages(conversation_id) do
+    import Ecto.Query
+
+    from(m in Message,
+      where: m.conversation_id == ^conversation_id,
+      order_by: [asc: m.inserted_at]
+    )
+    |> Repo.all()
+  end
+
+  # 대화 요약 생성
+  defp generate_conversation_summary(messages) do
+    user_messages =
+      messages
+      |> Enum.filter(fn m -> m.role == :user end)
+      |> Enum.map(fn m -> m.content end)
+
+    assistant_messages =
+      messages
+      |> Enum.filter(fn m -> m.role == :assistant end)
+      |> Enum.map(fn m -> m.content end)
+
+    %{
+      total_messages: length(messages),
+      user_message_count: length(user_messages),
+      assistant_message_count: length(assistant_messages),
+      topics: extract_topics(user_messages),
+      timestamp: DateTime.utc_now() |> DateTime.to_iso8601()
+    }
+  end
+
+  # 주요 토픽 추출 (간단한 구현)
+  defp extract_topics(user_messages) do
+    user_messages
+    |> Enum.take(5)
+    |> Enum.map(fn msg -> String.slice(msg, 0, 50) end)
   end
 end
