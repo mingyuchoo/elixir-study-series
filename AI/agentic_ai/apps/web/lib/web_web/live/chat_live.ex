@@ -36,6 +36,9 @@ defmodule WebWeb.ChatLive do
       |> assign(:agent_usage_history, [])
       |> assign(:user_profile, user_profile)
       |> assign(:message_sent_at, nil)
+      |> assign(:streaming_content, "")
+      |> assign(:streaming_message_id, nil)
+      |> assign(:streaming_status, nil)
 
     {:ok, socket}
   end
@@ -130,6 +133,7 @@ defmodule WebWeb.ChatLive do
     if input != "" and socket.assigns.current_conversation do
       conversation_id = socket.assigns.current_conversation.id
       now = DateTime.utc_now()
+      streaming_message_id = Ecto.UUID.generate()
 
       # UI 즉시 업데이트
       user_message = %{
@@ -146,9 +150,12 @@ defmodule WebWeb.ChatLive do
         |> assign(:loading, true)
         |> assign(:message_sent_at, now)
         |> assign(:agent_usage_history, [])
+        |> assign(:streaming_content, "")
+        |> assign(:streaming_message_id, streaming_message_id)
+        |> assign(:streaming_status, :streaming)
 
-      # 에이전트에게 비동기로 전송
-      send(self(), {:process_message, conversation_id, input})
+      # 에이전트에게 스트리밍 모드로 비동기 전송
+      send(self(), {:process_message_stream, conversation_id, input})
 
       {:noreply, socket}
     else
@@ -191,6 +198,159 @@ defmodule WebWeb.ChatLive do
           |> put_flash(:error, "Error: #{inspect(reason)}")
 
         {:noreply, socket}
+    end
+  end
+
+  @impl true
+  def handle_info({:process_message_stream, conversation_id, input}, socket) do
+    # 스트리밍 모드로 에이전트에게 전송
+    liveview_pid = self()
+
+    # 별도 프로세스에서 스트리밍 호출 (비동기)
+    Task.start(fn ->
+      case SupervisorAgent.stream_chat(conversation_id, input, liveview_pid) do
+        {:ok, _response} ->
+          # 완료 알림 (이미 stream_finish에서 처리됨)
+          :ok
+
+        {:error, reason} ->
+          send(liveview_pid, {:stream_error, conversation_id, reason})
+      end
+    end)
+
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_info({:stream_chunk, conversation_id, text}, socket) do
+    if socket.assigns.current_conversation &&
+         socket.assigns.current_conversation.id == conversation_id do
+      # 스트리밍 콘텐츠에 텍스트 추가
+      new_content = socket.assigns.streaming_content <> text
+
+      socket =
+        socket
+        |> assign(:streaming_content, new_content)
+        |> assign(:streaming_status, :streaming)
+
+      {:noreply, socket}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  @impl true
+  def handle_info({:stream_tool_start, conversation_id, tool_names}, socket) do
+    if socket.assigns.current_conversation &&
+         socket.assigns.current_conversation.id == conversation_id do
+      # 도구 실행 중 상태 표시
+      socket =
+        socket
+        |> assign(:streaming_status, {:tool_executing, tool_names})
+
+      {:noreply, socket}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  @impl true
+  def handle_info({:stream_tool_end, conversation_id}, socket) do
+    if socket.assigns.current_conversation &&
+         socket.assigns.current_conversation.id == conversation_id do
+      # 도구 실행 완료
+      socket =
+        socket
+        |> assign(:streaming_status, :streaming)
+
+      {:noreply, socket}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  @impl true
+  def handle_info({:stream_postprocess, conversation_id}, socket) do
+    if socket.assigns.current_conversation &&
+         socket.assigns.current_conversation.id == conversation_id do
+      # 후처리 중 상태
+      socket =
+        socket
+        |> assign(:streaming_status, :postprocessing)
+
+      {:noreply, socket}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  @impl true
+  def handle_info({:stream_finish, conversation_id}, socket) do
+    if socket.assigns.current_conversation &&
+         socket.assigns.current_conversation.id == conversation_id do
+      # 스트리밍 완료 - 후처리 결과를 기다림
+      # 최종 결과는 stream_complete에서 처리
+      socket =
+        socket
+        |> assign(:streaming_status, :finishing)
+
+      {:noreply, socket}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  @impl true
+  def handle_info({:stream_error, conversation_id, reason}, socket) do
+    if socket.assigns.current_conversation &&
+         socket.assigns.current_conversation.id == conversation_id do
+      socket =
+        socket
+        |> assign(:loading, false)
+        |> assign(:streaming_content, "")
+        |> assign(:streaming_message_id, nil)
+        |> assign(:streaming_status, nil)
+        |> assign(:agent_usage_history, [])
+        |> put_flash(:error, "스트리밍 오류: #{inspect(reason)}")
+
+      {:noreply, socket}
+    else
+      {:noreply, socket}
+    end
+  end
+
+  # 스트리밍 완료 후 최종 메시지 추가 (SupervisorAgent에서 DB 저장 후)
+  @impl true
+  def handle_info({:stream_complete, conversation_id, final_response}, socket) do
+    if socket.assigns.current_conversation &&
+         socket.assigns.current_conversation.id == conversation_id do
+      assistant_message = %{
+        id: socket.assigns.streaming_message_id,
+        role: :assistant,
+        content: final_response,
+        inserted_at: DateTime.utc_now()
+      }
+
+      # 에이전트 사용 이력 조회
+      message_sent_at = socket.assigns.message_sent_at
+      agent_usage_history = Agents.list_agent_usage_history(conversation_id, message_sent_at)
+
+      # 프로필 새로고침
+      user_profile = get_user_profile_for_display()
+
+      socket =
+        socket
+        |> assign(:messages, socket.assigns.messages ++ [assistant_message])
+        |> assign(:loading, false)
+        |> assign(:streaming_content, "")
+        |> assign(:streaming_message_id, nil)
+        |> assign(:streaming_status, nil)
+        |> assign(:agent_usage_history, agent_usage_history)
+        |> assign(:user_profile, user_profile)
+
+      {:noreply, socket}
+    else
+      {:noreply, socket}
     end
   end
 
@@ -442,18 +602,70 @@ defmodule WebWeb.ChatLive do
           <% end %>
 
           <%= if @loading do %>
-            <div class="flex justify-start">
-              <div class="bg-gray-200 rounded-lg p-4">
-                <div class="flex items-center space-x-2">
-                  <div class="animate-pulse flex space-x-1">
-                    <div class="w-2 h-2 bg-gray-500 rounded-full"></div>
-                    <div class="w-2 h-2 bg-gray-500 rounded-full"></div>
-                    <div class="w-2 h-2 bg-gray-500 rounded-full"></div>
+            <%= if @streaming_content != "" or @streaming_status do %>
+              <!-- 스트리밍 메시지 표시 -->
+              <div class="flex justify-start">
+                <div class="max-w-[70%] rounded-lg p-4 bg-gray-200 text-gray-800">
+                  <div class="text-xs text-gray-500 mb-1 flex items-center gap-2">
+                    Assistant
+                    <%= case @streaming_status do %>
+                      <% :streaming -> %>
+                        <span class="inline-flex items-center gap-1 text-blue-500">
+                          <span class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></span>
+                          실시간 응답 중...
+                        </span>
+                      <% {:tool_executing, tool_names} -> %>
+                        <span class="inline-flex items-center gap-1 text-orange-500">
+                          <.icon name="hero-cog-6-tooth" class="w-3 h-3 animate-spin" />
+                          도구 실행 중: {Enum.join(tool_names, ", ")}
+                        </span>
+                      <% :postprocessing -> %>
+                        <span class="inline-flex items-center gap-1 text-purple-500">
+                          <.icon name="hero-sparkles" class="w-3 h-3 animate-pulse" /> 응답 다듬는 중...
+                        </span>
+                      <% :finishing -> %>
+                        <span class="inline-flex items-center gap-1 text-green-500">
+                          <.icon name="hero-check-circle" class="w-3 h-3" /> 완료 중...
+                        </span>
+                      <% _ -> %>
+                        <span class="inline-flex items-center gap-1 text-gray-400">
+                          처리 중...
+                        </span>
+                    <% end %>
                   </div>
-                  <span class="text-sm text-gray-500">Thinking...</span>
+                  <%= if @streaming_content != "" do %>
+                    <div class="prose prose-sm max-w-none prose-headings:text-gray-800 prose-p:text-gray-700 prose-code:text-pink-600 prose-pre:bg-gray-800 prose-pre:text-gray-100 prose-a:text-blue-600 prose-strong:text-gray-900 prose-li:text-gray-700">
+                      {render_markdown(@streaming_content)}
+                    </div>
+                    <!-- 커서 애니메이션 -->
+                    <span class="inline-block w-2 h-4 bg-blue-500 animate-pulse ml-1"></span>
+                  <% else %>
+                    <div class="flex items-center space-x-2">
+                      <div class="animate-pulse flex space-x-1">
+                        <div class="w-2 h-2 bg-gray-500 rounded-full"></div>
+                        <div class="w-2 h-2 bg-gray-500 rounded-full"></div>
+                        <div class="w-2 h-2 bg-gray-500 rounded-full"></div>
+                      </div>
+                      <span class="text-sm text-gray-500">준비 중...</span>
+                    </div>
+                  <% end %>
                 </div>
               </div>
-            </div>
+            <% else %>
+              <!-- 기존 로딩 표시 -->
+              <div class="flex justify-start">
+                <div class="bg-gray-200 rounded-lg p-4">
+                  <div class="flex items-center space-x-2">
+                    <div class="animate-pulse flex space-x-1">
+                      <div class="w-2 h-2 bg-gray-500 rounded-full"></div>
+                      <div class="w-2 h-2 bg-gray-500 rounded-full"></div>
+                      <div class="w-2 h-2 bg-gray-500 rounded-full"></div>
+                    </div>
+                    <span class="text-sm text-gray-500">Thinking...</span>
+                  </div>
+                </div>
+              </div>
+            <% end %>
           <% end %>
         </div>
         

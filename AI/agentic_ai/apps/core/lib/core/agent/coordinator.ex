@@ -75,6 +75,59 @@ defmodule Core.Agent.Coordinator do
   end
 
   @doc """
+  Worker에게 스트리밍 모드로 작업을 전달합니다.
+
+  ## Parameters
+
+    - `supervisor_id` - Supervisor 에이전트 ID
+    - `worker_id` - Worker 에이전트 ID
+    - `worker_pid` - Worker 프로세스 PID
+    - `task_attrs` - 작업 정보
+    - `stream_callback` - 스트리밍 청크 콜백 함수
+
+  ## Returns
+
+    - `{:ok, result}` - 성공 시 최종 결과
+    - `{:error, reason}` - 실패 시 오류 원인
+  """
+  def send_task_stream(supervisor_id, worker_id, worker_pid, task_attrs, stream_callback) do
+    conversation_id = task_attrs[:conversation_id]
+    user_request = task_attrs[:user_request]
+
+    Logger.info(
+      "Coordinator: Supervisor #{supervisor_id} sending streaming task to Worker #{worker_id}"
+    )
+
+    # 상호작용 기록 - 작업 위임
+    {:ok, interaction} =
+      create_interaction(supervisor_id, worker_id, conversation_id, :task_delegation, %{
+        user_request: user_request,
+        streaming: true
+      })
+
+    # Worker에서 스트리밍 작업 실행
+    case WorkerAgent.execute_task_stream(worker_pid, task_attrs, stream_callback) do
+      {:ok, result} ->
+        # 상호작용 내용에 결과 추가
+        add_result_to_interaction(interaction, %{
+          status: "completed",
+          result: result
+        })
+
+        {:ok, result}
+
+      {:error, reason} = error ->
+        # 상호작용 내용에 오류 추가
+        add_result_to_interaction(interaction, %{
+          status: "failed",
+          error: inspect(reason)
+        })
+
+        error
+    end
+  end
+
+  @doc """
   특정 대화의 모든 작업을 조회합니다.
 
   ## Examples

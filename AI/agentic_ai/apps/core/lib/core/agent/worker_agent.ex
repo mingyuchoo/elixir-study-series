@@ -50,6 +50,24 @@ defmodule Core.Agent.WorkerAgent do
     GenServer.call(worker_pid, {:execute_task, task_attrs}, 120_000)
   end
 
+  @doc """
+  Worker에게 스트리밍 모드로 작업을 실행하도록 요청합니다.
+
+  ## Parameters
+
+    - `worker_pid` - Worker 프로세스 PID
+    - `task_attrs` - 작업 정보
+    - `stream_callback` - 스트리밍 청크 콜백 함수
+
+  ## Returns
+
+    - `{:ok, result}` - 성공 시 최종 결과
+    - `{:error, reason}` - 실패 시 오류 원인
+  """
+  def execute_task_stream(worker_pid, task_attrs, stream_callback) do
+    GenServer.call(worker_pid, {:execute_task_stream, task_attrs, stream_callback}, 180_000)
+  end
+
   # 서버 콜백
 
   @impl true
@@ -94,6 +112,50 @@ defmodule Core.Agent.WorkerAgent do
 
     # ReactEngine을 사용하여 작업 실행
     case run_task(state, task_attrs) do
+      {:ok, result} ->
+        duration_ms = System.monotonic_time(:millisecond) - start_time
+
+        # 작업 상태를 완료로 업데이트
+        {:ok, _agent_task} = update_task_status(agent_task, :completed, result)
+
+        # 성공 작업 학습 (메모리 저장)
+        record_task_execution(state, task_attrs, result, duration_ms, true)
+
+        state = %{state | current_task: nil}
+        {:reply, {:ok, result}, state}
+
+      {:error, reason} = error ->
+        duration_ms = System.monotonic_time(:millisecond) - start_time
+
+        # 작업 상태를 실패로 업데이트
+        {:ok, _agent_task} = update_task_status(agent_task, :failed, reason)
+
+        # 실패 패턴 학습 (메모리 저장)
+        record_task_execution(state, task_attrs, reason, duration_ms, false)
+
+        state = %{state | current_task: nil}
+        {:reply, error, state}
+    end
+  end
+
+  @impl true
+  def handle_call({:execute_task_stream, task_attrs, stream_callback}, _from, state) do
+    Logger.info("WorkerAgent #{state.agent.name} received streaming task: #{inspect(task_attrs)}")
+
+    # AgentTask 레코드 생성
+    {:ok, agent_task} = create_agent_task(state, task_attrs)
+    state = %{state | current_task: agent_task}
+
+    # 작업 상태를 진행 중으로 업데이트
+    {:ok, agent_task} =
+      agent_task
+      |> AgentTask.changeset(%{status: :in_progress, started_at: DateTime.utc_now()})
+      |> Repo.update()
+
+    start_time = System.monotonic_time(:millisecond)
+
+    # ReactEngine 스트리밍 모드로 실행
+    case run_task_stream(state, task_attrs, stream_callback) do
       {:ok, result} ->
         duration_ms = System.monotonic_time(:millisecond) - start_time
 
@@ -202,6 +264,32 @@ defmodule Core.Agent.WorkerAgent do
 
       {:error, reason} ->
         Logger.error("Task execution failed: #{inspect(reason)}")
+        {:error, reason}
+    end
+  end
+
+  defp run_task_stream(state, task_attrs, stream_callback) do
+    user_request = task_attrs[:user_request]
+    context = task_attrs[:context]
+
+    # 초기 메시지 구성
+    messages = build_initial_messages(user_request, context)
+
+    # 스킬이 포함된 시스템 프롬프트 구성
+    system_prompt = build_system_prompt_with_skills(state.agent)
+
+    # ReactEngine 스트리밍 모드 실행
+    opts = [
+      system_prompt: system_prompt,
+      max_iterations: state.agent.max_iterations || 10
+    ]
+
+    case ReactEngine.run_stream(messages, state.tools, stream_callback, opts) do
+      {:ok, result, _final_messages} ->
+        {:ok, result}
+
+      {:error, reason} ->
+        Logger.error("Streaming task execution failed: #{inspect(reason)}")
         {:error, reason}
     end
   end

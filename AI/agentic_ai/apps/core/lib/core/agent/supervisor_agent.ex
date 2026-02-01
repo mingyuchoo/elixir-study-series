@@ -66,6 +66,28 @@ defmodule Core.Agent.SupervisorAgent do
     GenServer.call(via_tuple(conversation_id), {:chat, user_message}, 180_000)
   end
 
+  @doc """
+  Supervisor에게 스트리밍 모드로 사용자 메시지를 전달합니다.
+
+  ## Parameters
+
+    - `conversation_id` - 대화 ID
+    - `user_message` - 사용자 메시지
+    - `liveview_pid` - 스트리밍 청크를 수신할 LiveView 프로세스 PID
+
+  ## Returns
+
+    - `{:ok, response}` - 성공 시 최종 응답
+    - `{:error, reason}` - 실패 시 오류 원인
+  """
+  def stream_chat(conversation_id, user_message, liveview_pid) do
+    GenServer.call(
+      via_tuple(conversation_id),
+      {:stream_chat, user_message, liveview_pid},
+      180_000
+    )
+  end
+
   # 서버 콜백
 
   @impl true
@@ -148,6 +170,44 @@ defmodule Core.Agent.SupervisorAgent do
       :complete ->
         # 프로필 수집 완료, 정상 처리
         process_normal_message(state, user_message)
+    end
+  end
+
+  @impl true
+  def handle_call({:stream_chat, user_message, liveview_pid}, _from, state) do
+    Logger.info("SupervisorAgent received streaming message: #{user_message}")
+
+    # 프로필 수집 중인 경우 일반 응답 (짧은 응답이므로 스트리밍 불필요)
+    case state.profile_state do
+      :idle ->
+        case check_and_start_profile_collection(state) do
+          {:collecting, new_state, greeting} ->
+            save_message(state.conversation_id, %{
+              role: :user,
+              content: user_message,
+              agent_id: nil
+            })
+
+            save_message(state.conversation_id, %{
+              role: :assistant,
+              content: greeting,
+              agent_id: state.agent_id
+            })
+
+            {:reply, {:ok, greeting}, new_state}
+
+          {:complete, _state} ->
+            process_streaming_message(state, user_message, liveview_pid)
+        end
+
+      collecting_state
+      when collecting_state in [:collecting_user_name, :collecting_agent_name, :collecting_city] ->
+        # 프로필 수집 중 - 일반 응답 처리
+        process_profile_response(state, user_message)
+
+      :complete ->
+        # 프로필 수집 완료, 스트리밍 처리
+        process_streaming_message(state, user_message, liveview_pid)
     end
   end
 
@@ -318,6 +378,59 @@ defmodule Core.Agent.SupervisorAgent do
     MemoryManager.save_user_profile(profile)
   end
 
+  # 스트리밍 메시지 처리
+  defp process_streaming_message(state, user_message, liveview_pid) do
+    start_time = System.monotonic_time(:millisecond)
+
+    # 사용자 메시지 저장
+    save_message(state.conversation_id, %{
+      role: :user,
+      content: user_message,
+      agent_id: nil
+    })
+
+    # Worker에게 스트리밍 작업 위임
+    case delegate_to_worker_stream(state, user_message, liveview_pid) do
+      {:ok, result, worker_name} ->
+        duration_ms = System.monotonic_time(:millisecond) - start_time
+
+        # 어시스턴트 메시지 저장
+        save_message(state.conversation_id, %{
+          role: :assistant,
+          content: result,
+          agent_id: state.agent_id
+        })
+
+        # 성능 메트릭 기록
+        record_performance_metric(state, worker_name, duration_ms, true)
+
+        # LiveView에 완료 알림 (최종 응답 포함)
+        send(liveview_pid, {:stream_complete, state.conversation_id, result})
+
+        {:reply, {:ok, result}, state}
+
+      {:error, reason} = error ->
+        duration_ms = System.monotonic_time(:millisecond) - start_time
+
+        # 오류 메시지 저장
+        error_message = "작업 수행 중 오류가 발생했습니다: #{inspect(reason)}"
+
+        save_message(state.conversation_id, %{
+          role: :assistant,
+          content: error_message,
+          agent_id: state.agent_id
+        })
+
+        # 실패 메트릭 기록
+        record_performance_metric(state, "unknown", duration_ms, false)
+
+        # 학습을 위한 오류 패턴 기록
+        record_error_pattern(state, user_message, reason)
+
+        {:reply, error, state}
+    end
+  end
+
   # 일반 메시지 처리 (기존 로직)
   defp process_normal_message(state, user_message) do
     start_time = System.monotonic_time(:millisecond)
@@ -427,6 +540,89 @@ defmodule Core.Agent.SupervisorAgent do
     end
   end
 
+  # 스트리밍 모드로 Worker에게 작업 위임
+  defp delegate_to_worker_stream(state, user_request, liveview_pid) do
+    # 후처리 Worker 제외한 핵심 Worker만 필터링
+    postprocess_workers = ["restructure_worker", "emoji_worker"]
+
+    available_workers =
+      state.worker_agents
+      |> Enum.map(fn {agent, _pid} -> agent end)
+      |> Enum.reject(fn agent -> agent.name in postprocess_workers end)
+
+    # 1단계: 핵심 Worker 선택 및 스트리밍 실행
+    case TaskRouter.select_worker(user_request, available_workers) do
+      {:ok, selected_worker} ->
+        Logger.info("[Streaming Pipeline] Selected primary worker: #{selected_worker.name}")
+
+        # 스트리밍 콜백 생성 - LiveView에 청크 전송
+        stream_callback = fn
+          {:chunk, text} ->
+            send(liveview_pid, {:stream_chunk, state.conversation_id, text})
+
+          {:tool_execution, tool_calls} ->
+            tool_names = Enum.map(tool_calls, fn tc -> tc["function"]["name"] end)
+            send(liveview_pid, {:stream_tool_start, state.conversation_id, tool_names})
+
+          {:tool_completed, _tool_calls} ->
+            send(liveview_pid, {:stream_tool_end, state.conversation_id})
+
+          {:finish, _reason} ->
+            send(liveview_pid, {:stream_finish, state.conversation_id})
+
+          _ ->
+            :ok
+        end
+
+        case execute_worker_by_agent_stream(
+               state,
+               selected_worker,
+               user_request,
+               nil,
+               stream_callback
+             ) do
+          {:ok, primary_result} ->
+            Logger.info("[Streaming Pipeline] Primary worker completed")
+
+            # 후처리는 비스트리밍으로 처리 (짧은 응답)
+            # 스트리밍 완료 알림
+            send(liveview_pid, {:stream_postprocess, state.conversation_id})
+
+            # 2단계: restructure_worker로 구조 재편
+            case execute_postprocess_worker(state, "restructure_worker", primary_result) do
+              {:ok, restructured_result} ->
+                Logger.info("[Pipeline 2/3] Restructure worker completed")
+
+                # 3단계: emoji_worker로 스타일 개선
+                case execute_postprocess_worker(state, "emoji_worker", restructured_result) do
+                  {:ok, final_result} ->
+                    Logger.info("[Pipeline 3/3] Emoji worker completed")
+                    {:ok, final_result, selected_worker.name}
+
+                  {:error, :worker_not_found} ->
+                    {:ok, restructured_result, selected_worker.name}
+
+                  {:error, _reason} ->
+                    {:ok, restructured_result, selected_worker.name}
+                end
+
+              {:error, :worker_not_found} ->
+                {:ok, primary_result, selected_worker.name}
+
+              {:error, _reason} ->
+                {:ok, primary_result, selected_worker.name}
+            end
+
+          {:error, reason} ->
+            {:error, reason}
+        end
+
+      {:error, :no_workers_available} = error ->
+        Logger.error("No workers available for streaming")
+        error
+    end
+  end
+
   defp delegate_to_worker(state, user_request) do
     # 3단계 파이프라인 실행:
     # 1단계: 핵심 Worker 선택 및 실행 (calculator, general 등)
@@ -513,6 +709,30 @@ defmodule Core.Agent.SupervisorAgent do
         }
 
         Coordinator.send_task(state.agent_id, agent.id, worker_pid, task_attrs)
+
+      {:error, _} = error ->
+        error
+    end
+  end
+
+  # 특정 Agent 구조체로 Worker 스트리밍 실행
+  defp execute_worker_by_agent_stream(state, agent, user_request, context, stream_callback) do
+    case find_worker_pid(state, agent.id) do
+      {:ok, worker_pid} ->
+        task_attrs = %{
+          conversation_id: state.conversation_id,
+          supervisor_id: state.agent_id,
+          user_request: user_request,
+          context: context
+        }
+
+        Coordinator.send_task_stream(
+          state.agent_id,
+          agent.id,
+          worker_pid,
+          task_attrs,
+          stream_callback
+        )
 
       {:error, _} = error ->
         error
