@@ -36,13 +36,13 @@ defmodule Auth.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:dns_cluster, "~> 0.1.1"},
+      {:dns_cluster, "~> 0.1"},
       {:phoenix_pubsub, "~> 2.1"},
       {:ecto_sql, "~> 3.13"},
-      {:postgrex, ">= 0.0.0"},
+      {:postgrex, "~> 0.21"},
       {:jason, "~> 1.2"},
-      {:swoosh, "~> 1.5"},
-      {:finch, "~> 0.13"},
+      {:swoosh, "~> 1.19"},
+      {:finch, "~> 0.20"},
       {:guardian, "~> 2.3"},
       {:playa, in_umbrella: true}
     ]
