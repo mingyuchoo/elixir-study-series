@@ -58,7 +58,7 @@ defmodule PlayaWeb.MixProject do
       {:auth, in_umbrella: true},
       {:productivity, in_umbrella: true},
       {:jason, "~> 1.2"},
-      {:bandit, "~> 1.2"},
+      {:bandit, "~> 1.8"},
       {:timex, "~> 3.7.11"}
     ]
   end
