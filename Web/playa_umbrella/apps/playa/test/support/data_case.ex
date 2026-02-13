@@ -16,8 +16,6 @@ defmodule Playa.DataCase do
 
   use ExUnit.CaseTemplate
 
-  import Playa.TestHelpers
-
   using do
     quote do
       alias Playa.Repo

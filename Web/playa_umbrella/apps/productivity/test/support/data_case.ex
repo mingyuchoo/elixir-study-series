@@ -16,8 +16,6 @@ defmodule Productivity.DataCase do
 
   use ExUnit.CaseTemplate
 
-  import Playa.TestHelpers
-
   using do
     quote do
       alias Productivity.Repo
