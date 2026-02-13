@@ -1,6 +1,7 @@
 defmodule Auth.GuardianPipelineMaybeTest do
   use Auth.DataCase
-  use Plug.Test
+  import Plug.Test
+  import Plug.Conn
 
   alias Auth.GuardianPipelineMaybe
   alias Auth.Guardian

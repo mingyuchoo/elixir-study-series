@@ -2,8 +2,6 @@ defmodule Playa.Accounts.RoleAssignmentsTest do
   use Playa.DataCase
 
   alias Playa.Accounts.RoleAssignments
-  alias Playa.Accounts.RoleUser
-  alias Playa.Repo
 
   import Playa.AccountsFixtures
 
@@ -24,7 +22,7 @@ defmodule Playa.Accounts.RoleAssignmentsTest do
     end
 
     test "ID 순으로 정렬되어 반환한다" do
-      role = role_fixture()
+      _role = role_fixture()
       _user1 = user_fixture()
       _user2 = user_fixture()
 

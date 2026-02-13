@@ -251,7 +251,7 @@ defmodule Playa.Accounts.UserTokenTest do
 
     test "일치하지 않는 토큰은 조회되지 않는다" do
       user = user_fixture()
-      {token, user_token} = UserToken.build_session_token(user)
+      {_token, user_token} = UserToken.build_session_token(user)
       Repo.insert!(user_token)
 
       wrong_token = :crypto.strong_rand_bytes(32)

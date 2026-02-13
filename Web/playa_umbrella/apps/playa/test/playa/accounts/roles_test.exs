@@ -2,8 +2,6 @@ defmodule Playa.Accounts.RolesTest do
   use Playa.DataCase
 
   alias Playa.Accounts.Roles
-  alias Playa.Accounts.Role
-  alias Playa.Repo
 
   import Playa.AccountsFixtures
 
