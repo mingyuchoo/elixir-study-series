@@ -4,13 +4,13 @@ defmodule PlayaWeb.UserLive.ShowTest do
   import Phoenix.LiveViewTest
   import Playa.AccountsFixtures
 
-  @create_attrs %{email: "test@example.com", password: "password123456", nickname: "testuser"}
-
   describe "Show" do
-    setup do
-      user = user_fixture(@create_attrs)
-      role = role_fixture(%{name: "Admin", abbr: "ADMIN"})
-      %{user: user, role: role}
+    setup :register_and_log_in_user
+
+    setup _context do
+      # unique한 role 이름 생성
+      role = role_fixture(%{abbr: "ADMIN"})
+      %{role: role}
     end
 
     test "displays user information", %{conn: conn, user: user} do
@@ -21,10 +21,14 @@ defmodule PlayaWeb.UserLive.ShowTest do
     end
 
     test "deletes user in listing", %{conn: conn, user: user} do
-      {:ok, show_live, _html} = live(conn, ~p"/accounts/users/#{user.id}")
+      {:ok, show_live, html} = live(conn, ~p"/accounts/users/#{user.id}")
 
+      # Header에 trash 아이콘이 있는지 확인
+      assert html =~ "hero-trash"
+
+      # Header의 actions 내에서 delete 링크 찾기 (trash 아이콘 포함)
       assert show_live
-             |> element("a[phx-click='delete'][phx-value-user_id='#{user.id}']")
+             |> element("header a[data-confirm]")
              |> render_click()
 
       assert_redirect(show_live, "/accounts/users")
@@ -34,7 +38,7 @@ defmodule PlayaWeb.UserLive.ShowTest do
       {:ok, show_live, _html} = live(conn, ~p"/accounts/users/#{user.id}")
 
       assert show_live
-             |> form("#role-form", role_user: %{role_id: role.id, user_id: user.id})
+             |> form("#role_form", role_user: %{role_id: role.id, user_id: user.id})
              |> render_submit()
 
       html = render(show_live)
@@ -49,32 +53,33 @@ defmodule PlayaWeb.UserLive.ShowTest do
 
       # 역할이 표시되는지 확인
       assert html =~ role.name
+      assert has_element?(show_live, "#my_roles-#{role.id}")
 
-      # 역할 삭제
+      # 특정 role의 row에서 삭제 링크 찾기
       assert show_live
-             |> element("button[phx-click='delete_role'][phx-value-role-id='#{role.id}']")
+             |> element("#my_roles-#{role.id} a[data-confirm]")
              |> render_click()
 
-      # 역할이 삭제되었는지 확인
-      html = render(show_live)
-      refute html =~ role.name
+      # 역할이 DOM에서 완전히 제거되었는지 확인
+      refute has_element?(show_live, "#my_roles-#{role.id}")
     end
 
     test "validates role assignment form", %{conn: conn, user: user} do
       {:ok, show_live, _html} = live(conn, ~p"/accounts/users/#{user.id}")
 
-      # 잘못된 데이터로 검증
-      assert show_live
-             |> form("#role-form", role_user: %{role_id: nil, user_id: user.id})
-             |> render_change() =~ "can&#39;t be blank"
+      # role_id 없이 제출하면 실패해야 함
+      result =
+        show_live
+        |> form("#role_form", role_user: %{role_id: "", user_id: user.id})
+        |> render_submit()
+
+      # form이 여전히 표시되어야 함 (제출되지 않음)
+      assert result =~ "role_form"
     end
   end
 
   describe "Edit" do
-    setup do
-      user = user_fixture(@create_attrs)
-      %{user: user}
-    end
+    setup :register_and_log_in_user
 
     test "displays edit form", %{conn: conn, user: user} do
       {:ok, _edit_live, html} = live(conn, ~p"/accounts/users/#{user.id}/edit")

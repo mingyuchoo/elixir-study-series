@@ -67,6 +67,7 @@ defmodule PlayaWeb.UserLive.Show do
   @impl true
   def handle_event("delete_role", %{"role_id" => role_id, "user_id" => user_id}, socket) do
     role_user = Accounts.get_role_user(role_id, user_id)
+    role = Accounts.get_role!(role_id)
     {:ok, _} = role_user |> Accounts.delete_role_user()
 
     {:noreply,
@@ -75,6 +76,7 @@ defmodule PlayaWeb.UserLive.Show do
        :remain_roles,
        role_user.user_id
        |> Accounts.list_remain_roles_by_user_id()
-     )}
+     )
+     |> stream_delete(:my_roles, role)}
   end
 end
