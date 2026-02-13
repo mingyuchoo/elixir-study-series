@@ -198,6 +198,52 @@ socket = assign(socket, form: to_form(changeset))
 - `assets/js/`에 배치하고 `LiveSocket` 생성자에 전달
 - `phx-hook`과 함께 `phx-update="ignore"` 사용 시 고유 DOM id 필수
 
+## 테스트 가이드라인 (TDD 필수)
+
+모든 코드 변경은 **TDD(Test-Driven Development)** 방식을 따라야 합니다.
+
+### TDD 사이클
+
+새로운 기능 추가 또는 버그 수정 시 반드시 다음 순서를 따릅니다:
+
+1. **Red**: 실패하는 테스트를 먼저 작성
+2. **Green**: 테스트를 통과하는 최소한의 구현 코드 작성
+3. **Refactor**: 테스트가 통과하는 상태를 유지하며 코드 개선
+
+### TDD 규칙
+
+- **테스트 먼저**: 구현 코드를 작성하기 전에 반드시 테스트를 먼저 작성
+- **최소 구현**: 테스트를 통과하기 위한 최소한의 코드만 작성
+- **점진적 진행**: 한 번에 하나의 테스트만 추가하고 통과시키기
+- **커버리지 유지**: `mix test --cover`로 커버리지 확인, 새 코드는 반드시 테스트 포함
+- **테스트 격리**: 각 테스트는 독립적으로 실행 가능해야 함 (다른 테스트에 의존 금지)
+
+### 테스트 작성 패턴
+
+```elixir
+# describe 블록으로 함수 단위 그룹화
+describe "create_user/1" do
+  test "유효한 속성으로 사용자 생성 성공" do
+    attrs = %{name: "홍길동", email: "hong@example.com"}
+    assert {:ok, %User{} = user} = Accounts.create_user(attrs)
+    assert user.name == "홍길동"
+  end
+
+  test "이메일 누락 시 에러 반환" do
+    attrs = %{name: "홍길동"}
+    assert {:error, %Ecto.Changeset{}} = Accounts.create_user(attrs)
+  end
+end
+```
+
+### 테스트 모범 사례
+
+- 프로세스 시작 시 `start_supervised!/1` 사용
+- 테스트 동기화: `Process.sleep/1` 대신 `Process.monitor/1` 사용
+- 외부 API 호출은 Mock/Stub 사용 (Mox 라이브러리 권장)
+- 픽스처 대신 ExMachina 또는 팩토리 패턴 사용 권장
+- `async: true` 설정으로 테스트 병렬 실행 (DB 격리 필요 시 Sandbox 사용)
+
 ## Elixir 가이드라인
 
 ### 중요 주의사항
@@ -236,8 +282,6 @@ Ecto.Changeset.get_field(changeset, :field)
 - `is_` prefix는 guard 함수용으로 예약
 - 사용자 입력에 `String.to_atom/1` 사용 금지 (메모리 누수 위험)
 - 중첩 모듈 정의 금지 (순환 의존성 위험)
-- 테스트에서 프로세스 시작 시 `start_supervised!/1` 사용
-- 테스트 동기화: `Process.sleep/1` 대신 `Process.monitor/1` 사용
 
 ### OTP 패턴
 
