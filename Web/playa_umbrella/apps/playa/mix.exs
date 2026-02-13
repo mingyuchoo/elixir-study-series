@@ -13,7 +13,14 @@ defmodule Playa.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test
+      ]
     ]
   end
 
@@ -43,7 +50,8 @@ defmodule Playa.MixProject do
       {:postgrex, "~> 0.21"},
       {:jason, "~> 1.2"},
       {:swoosh, "~> 1.19"},
-      {:finch, "~> 0.20"}
+      {:finch, "~> 0.20"},
+      {:excoveralls, "~> 0.18", only: :test}
     ]
   end
 

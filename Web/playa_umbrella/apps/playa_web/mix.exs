@@ -13,7 +13,14 @@ defmodule PlayaWeb.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test
+      ]
     ]
   end
 
@@ -41,7 +48,7 @@ defmodule PlayaWeb.MixProject do
       {:phoenix_html, "~> 4.0"},
       {:phoenix_live_reload, "~> 1.6", only: :dev},
       {:phoenix_live_view, "~> 1.1"},
-      # {:floki, ">= 0.30.0", only: :test},
+      {:floki, ">= 0.30.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.8"},
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
@@ -59,7 +66,8 @@ defmodule PlayaWeb.MixProject do
       {:productivity, in_umbrella: true},
       {:jason, "~> 1.2"},
       {:bandit, "~> 1.8"},
-      {:timex, "~> 3.7.11"}
+      {:timex, "~> 3.7.11"},
+      {:excoveralls, "~> 0.18", only: :test}
     ]
   end
 
