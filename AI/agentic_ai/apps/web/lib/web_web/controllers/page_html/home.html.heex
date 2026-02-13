@@ -67,11 +67,9 @@
         <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-3">
           <a
             href="https://hexdocs.pm/phoenix/overview.html"
-            class="group relative rounded-box px-6 py-4 text-sm font-semibold leading-6 sm:py-6"
+            class="card card-border bg-base-200 hover:bg-base-300 transition hover:scale-105"
           >
-            <span class="absolute inset-0 rounded-box bg-base-200 transition group-hover:bg-base-300 sm:group-hover:scale-105">
-            </span>
-            <span class="relative flex items-center gap-4 sm:flex-col">
+            <div class="card-body items-center text-center p-4 sm:p-6">
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="h-6 w-6">
                 <path d="m12 4 10-2v18l-10 2V4Z" fill="currentColor" fill-opacity=".15" />
                 <path
@@ -82,16 +80,14 @@
                   stroke-linejoin="round"
                 />
               </svg>
-              Guides &amp; Docs
-            </span>
+              <span class="text-sm font-semibold">Guides &amp; Docs</span>
+            </div>
           </a>
           <a
             href="https://github.com/phoenixframework/phoenix"
-            class="group relative rounded-box px-6 py-4 text-sm font-semibold leading-6 sm:py-6"
+            class="card card-border bg-base-200 hover:bg-base-300 transition hover:scale-105"
           >
-            <span class="absolute inset-0 rounded-box bg-base-200 transition group-hover:bg-base-300 sm:group-hover:scale-105">
-            </span>
-            <span class="relative flex items-center gap-4 sm:flex-col">
+            <div class="card-body items-center text-center p-4 sm:p-6">
               <svg viewBox="0 0 24 24" aria-hidden="true" class="h-6 w-6">
                 <path
                   fill="currentColor"
@@ -100,16 +96,14 @@
                   d="M12 0C5.37 0 0 5.506 0 12.303c0 5.445 3.435 10.043 8.205 11.674.6.107.825-.262.825-.585 0-.292-.015-1.261-.015-2.291C6 21.67 5.22 20.346 4.98 19.654c-.135-.354-.72-1.446-1.23-1.738-.42-.23-1.02-.8-.015-.815.945-.015 1.62.892 1.845 1.261 1.08 1.86 2.805 1.338 3.495 1.015.105-.8.42-1.338.765-1.645-2.67-.308-5.46-1.37-5.46-6.075 0-1.338.465-2.446 1.23-3.307-.12-.308-.54-1.569.12-3.26 0 0 1.005-.323 3.3 1.26.96-.276 1.98-.415 3-.415s2.04.139 3 .416c2.295-1.6 3.3-1.261 3.3-1.261.66 1.691.24 2.952.12 3.26.765.861 1.23 1.953 1.23 3.307 0 4.721-2.805 5.767-5.475 6.075.435.384.81 1.122.81 2.276 0 1.645-.015 2.968-.015 3.383 0 .323.225.707.825.585a12.047 12.047 0 0 0 5.919-4.489A12.536 12.536 0 0 0 24 12.304C24 5.505 18.63 0 12 0Z"
                 />
               </svg>
-              Source Code
-            </span>
+              <span class="text-sm font-semibold">Source Code</span>
+            </div>
           </a>
           <a
             href={"https://github.com/phoenixframework/phoenix/blob/v#{Application.spec(:phoenix, :vsn)}/CHANGELOG.md"}
-            class="group relative rounded-box px-6 py-4 text-sm font-semibold leading-6 sm:py-6"
+            class="card card-border bg-base-200 hover:bg-base-300 transition hover:scale-105"
           >
-            <span class="absolute inset-0 rounded-box bg-base-200 transition group-hover:bg-base-300 sm:group-hover:scale-105">
-            </span>
-            <span class="relative flex items-center gap-4 sm:flex-col">
+            <div class="card-body items-center text-center p-4 sm:p-6">
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="h-6 w-6">
                 <path
                   d="M12 1v6M12 17v6"
@@ -130,21 +124,17 @@
                   stroke-linejoin="round"
                 />
               </svg>
-              Changelog
-            </span>
+              <span class="text-sm font-semibold">Changelog</span>
+            </div>
           </a>
         </div>
         <div class="mt-10 grid grid-cols-1 gap-y-4 text-sm leading-6 text-base-content/80 sm:grid-cols-2">
           <div>
             <a
               href="https://elixirforum.com"
-              class="group -mx-2 -my-0.5 inline-flex items-center gap-3 rounded-lg px-2 py-0.5 hover:bg-base-200 hover:text-base-content"
+              class="link link-hover inline-flex items-center gap-3"
             >
-              <svg
-                viewBox="0 0 16 16"
-                aria-hidden="true"
-                class="h-4 w-4 fill-base-content/40 group-hover:fill-base-content"
-              >
+              <svg viewBox="0 0 16 16" aria-hidden="true" class="h-4 w-4 fill-current opacity-40">
                 <path d="M8 13.833c3.866 0 7-2.873 7-6.416C15 3.873 11.866 1 8 1S1 3.873 1 7.417c0 1.081.292 2.1.808 2.995.606 1.05.806 2.399.086 3.375l-.208.283c-.285.386-.01.905.465.85.852-.098 2.048-.318 3.137-.81a3.717 3.717 0 0 1 1.91-.318c.263.027.53.041.802.041Z" />
               </svg>
               Discuss on the Elixir Forum
@@ -153,13 +143,9 @@
           <div>
             <a
               href="https://discord.gg/elixir"
-              class="group -mx-2 -my-0.5 inline-flex items-center gap-3 rounded-lg px-2 py-0.5 hover:bg-base-200 hover:text-base-content"
+              class="link link-hover inline-flex items-center gap-3"
             >
-              <svg
-                viewBox="0 0 16 16"
-                aria-hidden="true"
-                class="h-4 w-4 fill-base-content/40 group-hover:fill-base-content"
-              >
+              <svg viewBox="0 0 16 16" aria-hidden="true" class="h-4 w-4 fill-current opacity-40">
                 <path d="M13.545 2.995c-1.02-.46-2.114-.8-3.257-.994a.05.05 0 0 0-.052.024c-.141.246-.297.567-.406.82a12.377 12.377 0 0 0-3.658 0 8.238 8.238 0 0 0-.412-.82.052.052 0 0 0-.052-.024 13.315 13.315 0 0 0-3.257.994.046.046 0 0 0-.021.018C.356 6.063-.213 9.036.066 11.973c.001.015.01.029.02.038a13.353 13.353 0 0 0 3.996 1.987.052.052 0 0 0 .056-.018c.308-.414.582-.85.818-1.309a.05.05 0 0 0-.028-.069 8.808 8.808 0 0 1-1.248-.585.05.05 0 0 1-.005-.084c.084-.062.168-.126.248-.191a.05.05 0 0 1 .051-.007c2.619 1.176 5.454 1.176 8.041 0a.05.05 0 0 1 .053.006c.08.065.164.13.248.192a.05.05 0 0 1-.004.084c-.399.23-.813.423-1.249.585a.05.05 0 0 0-.027.07c.24.457.514.893.817 1.307a.051.051 0 0 0 .056.019 13.31 13.31 0 0 0 4.001-1.987.05.05 0 0 0 .021-.037c.334-3.396-.559-6.345-2.365-8.96a.04.04 0 0 0-.021-.02Zm-8.198 7.19c-.789 0-1.438-.712-1.438-1.587 0-.874.637-1.586 1.438-1.586.807 0 1.45.718 1.438 1.586 0 .875-.637 1.587-1.438 1.587Zm5.316 0c-.788 0-1.438-.712-1.438-1.587 0-.874.637-1.586 1.438-1.586.807 0 1.45.718 1.438 1.586 0 .875-.63 1.587-1.438 1.587Z" />
               </svg>
               Join our Discord server
@@ -168,13 +154,9 @@
           <div>
             <a
               href="https://elixir-slack.community/"
-              class="group -mx-2 -my-0.5 inline-flex items-center gap-3 rounded-lg px-2 py-0.5 hover:bg-base-200 hover:text-base-content"
+              class="link link-hover inline-flex items-center gap-3"
             >
-              <svg
-                viewBox="0 0 16 16"
-                aria-hidden="true"
-                class="h-4 w-4 fill-base-content/40 group-hover:fill-base-content"
-              >
+              <svg viewBox="0 0 16 16" aria-hidden="true" class="h-4 w-4 fill-current opacity-40">
                 <path d="M3.361 10.11a1.68 1.68 0 1 1-1.68-1.681h1.68v1.682ZM4.209 10.11a1.68 1.68 0 1 1 3.361 0v4.21a1.68 1.68 0 1 1-3.361 0v-4.21ZM5.89 3.361a1.68 1.68 0 1 1 1.681-1.68v1.68H5.89ZM5.89 4.209a1.68 1.68 0 1 1 0 3.361H1.68a1.68 1.68 0 1 1 0-3.361h4.21ZM12.639 5.89a1.68 1.68 0 1 1 1.68 1.681h-1.68V5.89ZM11.791 5.89a1.68 1.68 0 1 1-3.361 0V1.68a1.68 1.68 0 0 1 3.361 0v4.21ZM10.11 12.639a1.68 1.68 0 1 1-1.681 1.68v-1.68h1.682ZM10.11 11.791a1.68 1.68 0 1 1 0-3.361h4.21a1.68 1.68 0 1 1 0 3.361h-4.21Z" />
               </svg>
               Join us on Slack
@@ -183,13 +165,9 @@
           <div>
             <a
               href="https://fly.io/docs/elixir/getting-started/"
-              class="group -mx-2 -my-0.5 inline-flex items-center gap-3 rounded-lg px-2 py-0.5 hover:bg-base-200 hover:text-base-content"
+              class="link link-hover inline-flex items-center gap-3"
             >
-              <svg
-                viewBox="0 0 20 20"
-                aria-hidden="true"
-                class="h-4 w-4 fill-base-content/40 group-hover:fill-base-content"
-              >
+              <svg viewBox="0 0 20 20" aria-hidden="true" class="h-4 w-4 fill-current opacity-40">
                 <path d="M1 12.5A4.5 4.5 0 005.5 17H15a4 4 0 001.866-7.539 3.504 3.504 0 00-4.504-4.272A4.5 4.5 0 004.06 8.235 4.502 4.502 0 001 12.5z" />
               </svg>
               Deploy your application

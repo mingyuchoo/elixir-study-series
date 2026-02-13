@@ -295,10 +295,12 @@ defmodule WebWeb.CoreComponents do
   # 인풋에서 폼 오류를 생성하는 데 사용하는 헬퍼
   defp error(assigns) do
     ~H"""
-    <p class="mt-1.5 flex gap-2 items-center text-sm text-error">
-      <.icon name="hero-exclamation-circle" class="size-5" />
-      {render_slot(@inner_block)}
-    </p>
+    <div class="label">
+      <span class="label-text-alt text-error flex gap-1.5 items-center">
+        <.icon name="hero-exclamation-circle" class="size-4" />
+        {render_slot(@inner_block)}
+      </span>
+    </div>
     """
   end
 

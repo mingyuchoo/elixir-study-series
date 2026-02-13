@@ -427,48 +427,48 @@ defmodule WebWeb.ChatLive do
           </button>
         </div>
 
-        <div class="flex-1 overflow-y-auto">
+        <ul class="menu menu-sm flex-1 overflow-y-auto p-2 gap-1">
           <%= for conv <- @conversations do %>
-            <div class={[
-              "group flex items-center justify-between p-3 cursor-pointer hover:bg-base-300 border-b border-base-300 transition-colors",
-              @current_conversation && @current_conversation.id == conv.id && "bg-base-300"
-            ]}>
-              <div
-                phx-click="select_conversation"
-                phx-value-id={conv.id}
-                class="flex-1 min-w-0"
-              >
-                <div class="truncate text-sm font-medium">{conv.title}</div>
-                <div class="text-xs text-base-content/50">
-                  {Calendar.strftime(conv.inserted_at, "%Y-%m-%d %H:%M")}
+            <li>
+              <div class={[
+                "group flex items-center justify-between",
+                @current_conversation && @current_conversation.id == conv.id && "active"
+              ]}>
+                <div
+                  phx-click="select_conversation"
+                  phx-value-id={conv.id}
+                  class="flex-1 min-w-0"
+                >
+                  <div class="truncate text-sm font-medium">{conv.title}</div>
+                  <div class="text-xs opacity-50">
+                    {Calendar.strftime(conv.inserted_at, "%Y-%m-%d %H:%M")}
+                  </div>
                 </div>
+                <button
+                  phx-click="delete_conversation"
+                  phx-value-id={conv.id}
+                  data-confirm="이 대화를 삭제하시겠습니까? 모든 메시지가 함께 삭제됩니다."
+                  class="btn btn-ghost btn-xs btn-circle text-error opacity-0 group-hover:opacity-100 transition-opacity"
+                  title="대화 삭제"
+                >
+                  <.icon name="hero-trash" class="w-4 h-4" />
+                </button>
               </div>
-              <button
-                phx-click="delete_conversation"
-                phx-value-id={conv.id}
-                data-confirm="이 대화를 삭제하시겠습니까? 모든 메시지가 함께 삭제됩니다."
-                class="btn btn-ghost btn-xs btn-circle text-error opacity-0 group-hover:opacity-100 transition-opacity"
-                title="대화 삭제"
-              >
-                <.icon name="hero-trash" class="w-4 h-4" />
-              </button>
-            </div>
+            </li>
           <% end %>
-        </div>
+        </ul>
         
     <!-- MCP Panel -->
-        <div class="border-t border-base-300 p-3">
-          <div class="text-xs font-semibold text-base-content/50 uppercase tracking-wider mb-2">
-            사용 가능한 MCP
-          </div>
+        <ul class="menu menu-xs border-t border-base-300 p-2">
+          <li class="menu-title">사용 가능한 MCP</li>
           <%= if @available_mcps == [] do %>
-            <div class="text-xs text-base-content/40 italic p-2">
-              설정된 MCP가 없습니다
-            </div>
+            <li class="disabled">
+              <span class="text-xs italic opacity-40">설정된 MCP가 없습니다</span>
+            </li>
           <% else %>
-            <div class="space-y-1">
-              <%= for mcp <- @available_mcps do %>
-                <div class="flex items-center gap-2 p-2 rounded-lg text-sm bg-base-300 hover:bg-base-300/80 transition">
+            <%= for mcp <- @available_mcps do %>
+              <li>
+                <div class="flex items-center gap-2">
                   <div class="badge badge-secondary badge-sm">
                     <.icon name="hero-server" class="w-3 h-3" />
                   </div>
@@ -476,7 +476,7 @@ defmodule WebWeb.ChatLive do
                     <div class="truncate font-medium text-secondary">
                       {mcp.name}
                     </div>
-                    <div class="truncate text-xs text-base-content/50">
+                    <div class="truncate text-xs opacity-50">
                       {mcp.command} {Enum.join(mcp.args, " ")}
                     </div>
                   </div>
@@ -487,22 +487,20 @@ defmodule WebWeb.ChatLive do
                     <span class={mcp_status_dot_class(mcp.status)}></span>
                   </span>
                 </div>
-              <% end %>
-            </div>
+              </li>
+            <% end %>
           <% end %>
-        </div>
+        </ul>
         
     <!-- Agent Panel -->
-        <div class="border-t border-base-300 p-3">
-          <div class="text-xs font-semibold text-base-content/50 uppercase tracking-wider mb-2">
-            사용 가능한 에이전트
-          </div>
-          <div class="space-y-1">
-            <%= for agent <- @available_agents do %>
-              <% usage_info = find_agent_usage(@agent_usage_history, agent.id) %>
+        <ul class="menu menu-xs border-t border-base-300 p-2">
+          <li class="menu-title">사용 가능한 에이전트</li>
+          <%= for agent <- @available_agents do %>
+            <% usage_info = find_agent_usage(@agent_usage_history, agent.id) %>
+            <li>
               <div class={[
-                "flex items-center gap-2 p-2 rounded-lg text-sm transition",
-                (usage_info && "bg-primary/10 ring-1 ring-primary/30") || "bg-base-300"
+                "flex items-center gap-2",
+                usage_info && "active"
               ]}>
                 <%= if usage_info do %>
                   <div class="badge badge-primary badge-sm font-bold">
@@ -516,7 +514,7 @@ defmodule WebWeb.ChatLive do
                     {agent.display_name || agent.name}
                   </div>
                   <%= if agent.description do %>
-                    <div class="truncate text-xs text-base-content/50">
+                    <div class="truncate text-xs opacity-50">
                       {agent.description}
                     </div>
                   <% end %>
@@ -525,28 +523,28 @@ defmodule WebWeb.ChatLive do
                   <.icon name="hero-check-circle" class="w-4 h-4 text-success" />
                 <% end %>
               </div>
-            <% end %>
-          </div>
-
-          <%= if @agent_usage_history != [] do %>
-            <div class="mt-3 pt-3 border-t border-base-300">
-              <div class="text-xs font-semibold text-base-content/50 uppercase tracking-wider mb-2">
-                실행 순서
-              </div>
-              <div class="flex flex-wrap gap-1">
-                <%= for usage <- @agent_usage_history do %>
-                  <div
-                    class="badge badge-primary badge-sm gap-1"
-                    title={Calendar.strftime(usage.timestamp, "%H:%M:%S")}
-                  >
-                    <span class="font-bold">{usage.order}.</span>
-                    {usage.agent.display_name || usage.agent.name}
-                  </div>
-                <% end %>
-              </div>
-            </div>
+            </li>
           <% end %>
-        </div>
+        </ul>
+
+        <%= if @agent_usage_history != [] do %>
+          <div class="border-t border-base-300 p-2">
+            <div class="text-xs font-semibold opacity-50 uppercase tracking-wider mb-2">
+              실행 순서
+            </div>
+            <div class="flex flex-wrap gap-1">
+              <%= for usage <- @agent_usage_history do %>
+                <div
+                  class="badge badge-primary badge-sm gap-1"
+                  title={Calendar.strftime(usage.timestamp, "%H:%M:%S")}
+                >
+                  <span class="font-bold">{usage.order}.</span>
+                  {usage.agent.display_name || usage.agent.name}
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
       </div>
       
     <!-- Main Chat Area -->
