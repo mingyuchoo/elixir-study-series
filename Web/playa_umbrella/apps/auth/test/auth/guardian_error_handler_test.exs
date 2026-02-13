@@ -143,4 +143,72 @@ defmodule Auth.GuardianErrorHandlerTest do
       assert byte_size(conn.resp_body) > 0
     end
   end
+
+  describe "에러 타입 변환 (safe_to_string)" do
+    test "문자열 타입과 이유를 그대로 사용한다" do
+      conn = conn(:get, "/")
+      conn = GuardianErrorHandler.auth_error(conn, {"string_error", "string_reason"}, [])
+
+      assert conn.status == 401
+      response = Jason.decode!(conn.resp_body)
+      assert response["error"] == "string_error"
+      assert response["reason"] == "string_reason"
+    end
+
+    test "아톰 타입과 이유를 문자열로 변환한다" do
+      conn = conn(:get, "/")
+      conn = GuardianErrorHandler.auth_error(conn, {:atom_error, :atom_reason}, [])
+
+      assert conn.status == 401
+      response = Jason.decode!(conn.resp_body)
+      assert response["error"] == "atom_error"
+      assert response["reason"] == "atom_reason"
+    end
+
+    test "구조체 타입을 inspect로 변환한다" do
+      error_struct = %RuntimeError{message: "test error"}
+      conn = conn(:get, "/")
+      conn = GuardianErrorHandler.auth_error(conn, {error_struct, :reason}, [])
+
+      assert conn.status == 401
+      response = Jason.decode!(conn.resp_body)
+      # 구조체는 inspect로 변환됨
+      assert String.contains?(response["error"], "RuntimeError")
+      assert response["reason"] == "reason"
+    end
+
+    test "구조체 이유를 inspect로 변환한다" do
+      error_struct = %ArgumentError{message: "invalid argument"}
+      conn = conn(:get, "/")
+      conn = GuardianErrorHandler.auth_error(conn, {:error, error_struct}, [])
+
+      assert conn.status == 401
+      response = Jason.decode!(conn.resp_body)
+      assert response["error"] == "error"
+      # 구조체는 inspect로 변환됨
+      assert String.contains?(response["reason"], "ArgumentError")
+    end
+
+    test "기타 타입을 inspect로 변환한다" do
+      conn = conn(:get, "/")
+      conn = GuardianErrorHandler.auth_error(conn, {[1, 2, 3], %{key: "value"}}, [])
+
+      assert conn.status == 401
+      response = Jason.decode!(conn.resp_body)
+      # 리스트와 맵은 inspect로 변환됨
+      assert response["error"] == "[1, 2, 3]"
+      assert String.contains?(response["reason"], "key")
+      assert String.contains?(response["reason"], "value")
+    end
+
+    test "혼합된 타입을 처리한다" do
+      conn = conn(:get, "/")
+      conn = GuardianErrorHandler.auth_error(conn, {:atom_error, "string_reason"}, [])
+
+      assert conn.status == 401
+      response = Jason.decode!(conn.resp_body)
+      assert response["error"] == "atom_error"
+      assert response["reason"] == "string_reason"
+    end
+  end
 end
