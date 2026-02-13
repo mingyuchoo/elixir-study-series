@@ -38,7 +38,7 @@ mix phx.server
 iex -S mix phx.server
 
 # 테스트 실행
-mix test                    # 모든 테스트
+mix test --cover            # 모든 테스트
 mix test test/path/file.exs # 특정 파일
 mix test --failed           # 실패한 테스트만
 
