@@ -54,6 +54,11 @@ defmodule Productivity.WorksTest do
       assert %{title: ["can't be blank"]} = errors_on(changeset)
     end
 
+    test "create_list/0 with no args returns error changeset" do
+      assert {:error, changeset} = Works.create_list()
+      assert %{title: ["can't be blank"]} = errors_on(changeset)
+    end
+
     test "update_list/2 with valid data updates the list" do
       list = list_fixture()
       update_attrs = %{title: "Updated Title"}
@@ -105,6 +110,24 @@ defmodule Productivity.WorksTest do
       assert {:ok, updated_list} = Works.decrease_item_count(list)
       assert updated_list.item_count == 0
     end
+
+    test "change_list/1 returns a changeset" do
+      list = list_fixture()
+      changeset = Works.change_list(list)
+
+      assert %Ecto.Changeset{} = changeset
+      assert changeset.data.id == list.id
+      assert Ecto.assoc_loaded?(changeset.data.user)
+      assert Ecto.assoc_loaded?(changeset.data.items)
+    end
+
+    test "change_list/2 returns a changeset with changes" do
+      list = list_fixture()
+      changeset = Works.change_list(list, %{title: "New Title"})
+
+      assert %Ecto.Changeset{} = changeset
+      assert changeset.changes.title == "New Title"
+    end
   end
 
   describe "Items" do
@@ -136,6 +159,12 @@ defmodule Productivity.WorksTest do
       assert Ecto.assoc_loaded?(fetched_item.list)
     end
 
+    test "get_item!/1 raises error when item does not exist" do
+      assert_raise Ecto.NoResultsError, fn ->
+        Works.get_item!(-1)
+      end
+    end
+
     test "create_item/1 with valid data creates an item" do
       list = list_fixture()
       attrs = valid_item_attributes(list.id)
@@ -151,6 +180,11 @@ defmodule Productivity.WorksTest do
 
     test "create_item/1 with invalid data returns error changeset" do
       assert {:error, changeset} = Works.create_item(%{})
+      assert %{title: ["can't be blank"]} = errors_on(changeset)
+    end
+
+    test "create_item/0 with no args returns error changeset" do
+      assert {:error, changeset} = Works.create_item()
       assert %{title: ["can't be blank"]} = errors_on(changeset)
     end
 
@@ -202,6 +236,26 @@ defmodule Productivity.WorksTest do
 
       assert %Ecto.Changeset{} = changeset
       assert changeset.data.id == item.id
+    end
+
+    test "change_item/2 returns a changeset with changes" do
+      list = list_fixture()
+      item = item_fixture(list.id)
+      changeset = Works.change_item(item, %{title: "Changed Title"})
+
+      assert %Ecto.Changeset{} = changeset
+      assert changeset.changes.title == "Changed Title"
+    end
+
+    test "Item.status_values/0 returns all valid status values" do
+      alias Productivity.Works.Item
+
+      status_values = Item.status_values()
+
+      assert status_values == [:todo, :doing, :done]
+      assert :todo in status_values
+      assert :doing in status_values
+      assert :done in status_values
     end
   end
 end

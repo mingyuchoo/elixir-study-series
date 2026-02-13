@@ -21,7 +21,9 @@ defmodule Playa.Accounts do
   defdelegate get_user_by_email(email), to: Users, as: :get_by_email
 
   @doc "이메일과 비밀번호로 사용자 인증"
-  defdelegate get_user_by_email_and_password(email, password), to: Users, as: :get_by_email_and_password
+  defdelegate get_user_by_email_and_password(email, password),
+    to: Users,
+    as: :get_by_email_and_password
 
   @doc "ID로 사용자 조회"
   defdelegate get_user!(id), to: Users, as: :get!

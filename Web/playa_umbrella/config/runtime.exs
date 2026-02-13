@@ -153,8 +153,7 @@ if config_env() == :prod do
       You can generate one by calling: mix guardian.gen.secret
       """
 
-  config :auth, Auth.Guardian,
-    secret_key: guardian_secret_key
+  config :auth, Auth.Guardian, secret_key: guardian_secret_key
 end
 
 # Configure Guardian secret key for all non-production environments

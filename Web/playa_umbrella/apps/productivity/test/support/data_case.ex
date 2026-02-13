@@ -44,10 +44,13 @@ defmodule Productivity.DataCase do
 
     playa_pid = Ecto.Adapters.SQL.Sandbox.start_owner!(Playa.Repo, shared: not tags[:async])
 
+    # Allow both repos to share the same connection for cross-schema references
+    Ecto.Adapters.SQL.Sandbox.allow(Productivity.Repo, productivity_pid, self())
+    Ecto.Adapters.SQL.Sandbox.allow(Playa.Repo, playa_pid, self())
+
     on_exit(fn ->
       Ecto.Adapters.SQL.Sandbox.stop_owner(productivity_pid)
       Ecto.Adapters.SQL.Sandbox.stop_owner(playa_pid)
     end)
   end
-
 end

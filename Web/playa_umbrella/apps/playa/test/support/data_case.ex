@@ -40,5 +40,4 @@ defmodule Playa.DataCase do
     pid = Ecto.Adapters.SQL.Sandbox.start_owner!(Playa.Repo, shared: not tags[:async])
     on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
   end
-
 end

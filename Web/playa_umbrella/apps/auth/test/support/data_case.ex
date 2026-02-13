@@ -46,5 +46,4 @@ defmodule Auth.DataCase do
       Ecto.Adapters.SQL.Sandbox.stop_owner(playa_pid)
     end)
   end
-
 end

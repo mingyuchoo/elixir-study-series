@@ -99,5 +99,4 @@ import_config "#{config_env()}.exs"
 
 # Guardian authentication configuration
 # The secret_key is configured in each environment file (dev.exs, test.exs, runtime.exs)
-config :auth, Auth.Guardian,
-  issuer: "auth"
+config :auth, Auth.Guardian, issuer: "auth"

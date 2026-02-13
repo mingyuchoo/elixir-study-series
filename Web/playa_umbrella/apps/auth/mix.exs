@@ -44,6 +44,7 @@ defmodule Auth.MixProject do
       {:swoosh, "~> 1.19"},
       {:finch, "~> 0.20"},
       {:guardian, "~> 2.3"},
+      {:plug, "~> 1.14", only: :test},
       {:playa, in_umbrella: true}
     ]
   end
