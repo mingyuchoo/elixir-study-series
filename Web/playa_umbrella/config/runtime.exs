@@ -141,4 +141,23 @@ if config_env() == :prod do
   # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
 
   config :playa, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
+
+  # Guardian authentication secret key
+  # Generate a new secret key by running: mix guardian.gen.secret
+  guardian_secret_key =
+    System.get_env("GUARDIAN_SECRET_KEY") ||
+      raise """
+      environment variable GUARDIAN_SECRET_KEY is missing.
+      You can generate one by calling: mix guardian.gen.secret
+      """
+
+  config :auth, Auth.Guardian,
+    secret_key: guardian_secret_key
+end
+
+# Configure Guardian secret key for all non-production environments
+# Production configuration is handled above in the prod block
+if config_env() == :dev do
+  # Development configuration is in dev.exs
+  :ok
 end

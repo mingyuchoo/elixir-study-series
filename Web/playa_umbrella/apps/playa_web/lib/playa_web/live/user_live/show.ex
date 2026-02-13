@@ -39,9 +39,13 @@ defmodule PlayaWeb.UserLive.Show do
   end
 
   @impl true
-  def handle_event("validate_role", %{"role_user" => _role_user_param}, socket) do
-    # FIXME: dbg(role_user_param)
-    {:noreply, socket}
+  def handle_event("validate_role", %{"role_user" => role_user_param}, socket) do
+    changeset =
+      %Accounts.RoleUser{}
+      |> Accounts.RoleUser.changeset(role_user_param)
+      |> Map.put(:action, :validate)
+
+    {:noreply, assign(socket, :role_form, to_form(changeset))}
   end
 
   @impl true
