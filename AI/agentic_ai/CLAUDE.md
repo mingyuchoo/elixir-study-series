@@ -298,10 +298,12 @@ Task.async_stream(collection, fn item -> process(item) end, timeout: :infinity)
 
 ## UI/UX 가이드라인
 
-- Tailwind CSS로 세련되고 반응형 인터페이스 제작
+- **DaisyUI + Tailwind CSS** 조합으로 세련되고 반응형 인터페이스 제작
+- DaisyUI 컴포넌트를 우선 사용하고, 부족한 부분은 Tailwind 유틸리티로 보완
+- 하드코딩된 색상 (`bg-blue-600`, `text-white` 등) 사용 금지 → 시맨틱 클래스 (`bg-primary`, `text-base-content` 등) 사용
 - 미묘한 마이크로 인터랙션 구현 (hover 효과, 전환 애니메이션)
 - 깨끗한 타이포그래피, 간격, 레이아웃 균형 유지
-- daisyUI 사용 금지 → 수동으로 Tailwind 기반 컴포넌트 작성
+- 참고: [DaisyUI Components](https://daisyui.com/components/)
 
 ## 환경 변수
 

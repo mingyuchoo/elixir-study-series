@@ -4,34 +4,8 @@
 
 /* This file is for your main application CSS */
 
-/* Alerts and form errors used by phx.new */
-.alert {
-  padding: 15px;
-  margin-bottom: 20px;
-  border: 1px solid transparent;
-  border-radius: 4px;
-}
-.alert-info {
-  color: #31708f;
-  background-color: #d9edf7;
-  border-color: #bce8f1;
-}
-.alert-warning {
-  color: #8a6d3b;
-  background-color: #fcf8e3;
-  border-color: #faebcc;
-}
-.alert-danger {
-  color: #a94442;
-  background-color: #f2dede;
-  border-color: #ebccd1;
-}
-.alert p {
-  margin-bottom: 0;
-}
-.alert:empty {
-  display: none;
-}
+/* Alert 스타일은 DaisyUI가 제공하므로 별도 정의하지 않습니다. */
+
 .invalid-feedback {
   color: #a94442;
   display: block;
@@ -143,38 +117,38 @@
 }
 
 /* ========================================
-   Markdown Rendering Styles
+   Markdown Rendering Styles (Monochrome)
    ======================================== */
 
 /* Prose customization for chat messages */
 .prose {
-  --tw-prose-body: #374151;
-  --tw-prose-headings: #111827;
-  --tw-prose-links: #2563eb;
-  --tw-prose-bold: #111827;
-  --tw-prose-code: #db2777;
-  --tw-prose-pre-bg: #1f2937;
-  --tw-prose-pre-code: #f3f4f6;
+  --tw-prose-body: #3f3f46;
+  --tw-prose-headings: #18181b;
+  --tw-prose-links: #27272a;
+  --tw-prose-bold: #18181b;
+  --tw-prose-code: #3f3f46;
+  --tw-prose-pre-bg: #18181b;
+  --tw-prose-pre-code: #e4e4e7;
 }
 
 /* Code blocks */
 .prose pre {
-  @apply rounded-lg shadow-md overflow-x-auto my-3;
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  @apply rounded-lg overflow-x-auto my-3;
+  background: #18181b;
+  border: 1px solid #27272a;
 }
 
 .prose pre code {
   @apply text-sm leading-relaxed;
   font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
-  color: #e2e8f0;
+  color: #d4d4d8;
 }
 
 /* Inline code */
 .prose code:not(pre code) {
   @apply px-1.5 py-0.5 rounded font-medium;
-  background: linear-gradient(135deg, #fce7f3 0%, #fdf2f8 100%);
-  color: #be185d;
+  background: #f4f4f5;
+  color: #27272a;
   font-size: 0.875em;
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
 }
@@ -186,21 +160,19 @@
 
 /* Headings */
 .prose h1 {
-  @apply text-xl font-bold mt-6 mb-3 pb-2 border-b border-gray-200;
-  background: linear-gradient(90deg, #1e40af, #3b82f6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  @apply text-xl font-bold mt-6 mb-3 pb-2;
+  color: #18181b;
+  border-bottom: 1px solid #e4e4e7;
 }
 
 .prose h2 {
   @apply text-lg font-semibold mt-5 mb-2;
-  color: #1e3a8a;
+  color: #27272a;
 }
 
 .prose h3 {
   @apply text-base font-semibold mt-4 mb-2;
-  color: #1e40af;
+  color: #3f3f46;
 }
 
 /* Lists */
@@ -214,8 +186,9 @@
 }
 
 .prose ul > li::before {
-  content: '▸';
-  @apply absolute left-0 text-blue-500 font-bold;
+  content: '—';
+  @apply absolute left-0 font-normal;
+  color: #a1a1aa;
 }
 
 .prose ol {
@@ -231,63 +204,79 @@
 
 .prose ol > li::before {
   content: counter(item);
-  @apply absolute left-0 flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-blue-500 rounded-full;
+  @apply absolute left-0 flex items-center justify-center w-5 h-5 text-xs font-bold rounded-full;
+  background: #27272a;
+  color: #fafafa;
 }
 
 /* Blockquotes */
 .prose blockquote {
-  @apply my-3 pl-4 py-2 border-l-4 border-blue-500 bg-blue-50 rounded-r-lg italic;
+  @apply my-3 pl-4 py-2 rounded-r-lg italic;
+  border-left: 4px solid #d4d4d8;
+  background: #fafafa;
   quotes: none;
 }
 
 .prose blockquote p {
-  @apply text-gray-700 m-0;
+  @apply m-0;
+  color: #52525b;
 }
 
 /* Tables */
 .prose table {
-  @apply w-full my-3 border-collapse rounded-lg overflow-hidden shadow-sm;
+  @apply w-full my-3 border-collapse rounded-lg overflow-hidden;
 }
 
 .prose thead {
-  @apply bg-gradient-to-r from-gray-100 to-gray-50;
+  background: #fafafa;
 }
 
 .prose th {
-  @apply px-4 py-2 text-left text-sm font-semibold text-gray-700 border-b-2 border-gray-200;
+  @apply px-4 py-2 text-left text-sm font-semibold;
+  color: #27272a;
+  border-bottom: 2px solid #e4e4e7;
 }
 
 .prose td {
-  @apply px-4 py-2 text-sm text-gray-600 border-b border-gray-100;
+  @apply px-4 py-2 text-sm;
+  color: #52525b;
+  border-bottom: 1px solid #f4f4f5;
 }
 
 .prose tbody tr:hover {
-  @apply bg-gray-50;
+  background: #fafafa;
 }
 
 /* Links */
 .prose a {
-  @apply text-blue-600 font-medium no-underline transition-colors;
+  @apply font-medium no-underline transition-colors;
+  color: #18181b;
+  text-decoration: underline;
+  text-decoration-color: #d4d4d8;
+  text-underline-offset: 2px;
 }
 
 .prose a:hover {
-  @apply text-blue-800 underline decoration-2 decoration-blue-300;
+  color: #09090b;
+  text-decoration-color: #71717a;
 }
 
 /* Horizontal rules */
 .prose hr {
   @apply my-4 border-0 h-px;
-  background: linear-gradient(90deg, transparent, #d1d5db, transparent);
+  background: #e4e4e7;
 }
 
 /* Strong/Bold */
 .prose strong {
-  @apply font-bold text-gray-900;
+  @apply font-bold;
+  color: #18181b;
 }
 
 /* Emphasis/Italic */
 .prose em {
-  @apply italic text-gray-700;
+  @apply italic;
+  color: #52525b;
 }
 
 /* Paragraphs */
@@ -297,7 +286,7 @@
 
 /* Images */
 .prose img {
-  @apply rounded-lg shadow-md my-3;
+  @apply rounded-lg my-3;
 }
 
 /* Task lists (checkboxes) */
@@ -314,5 +303,6 @@
 }
 
 .prose input[type="checkbox"] {
-  @apply mr-2 rounded border-gray-300;
+  @apply mr-2 rounded;
+  border-color: #d4d4d8;
 }

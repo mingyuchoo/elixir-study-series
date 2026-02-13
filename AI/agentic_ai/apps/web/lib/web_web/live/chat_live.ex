@@ -391,51 +391,55 @@ defmodule WebWeb.ChatLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="flex h-screen bg-gray-100">
+    <div class="flex h-screen bg-base-100">
       <!-- Sidebar -->
-      <div class="w-64 bg-gray-900 text-white flex flex-col">
+      <div class="w-64 bg-base-200 text-base-content flex flex-col border-r border-base-300">
         <!-- 사용자 프로필 섹션 -->
         <%= if @user_profile do %>
-          <div class="p-4 border-b border-gray-700 bg-gradient-to-r from-blue-900 to-purple-900">
+          <div class="p-4 border-b border-base-300 bg-neutral text-neutral-content">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
-                {String.first(@user_profile[:user_name] || @user_profile["user_name"] || "?")}
+              <div class="avatar placeholder">
+                <div class="w-10 rounded-full bg-neutral-content/20">
+                  <span class="text-lg font-bold">
+                    {String.first(@user_profile[:user_name] || @user_profile["user_name"] || "?")}
+                  </span>
+                </div>
               </div>
               <div>
                 <div class="font-medium text-sm">
                   {@user_profile[:user_name] || @user_profile["user_name"]}
                 </div>
-                <div class="text-xs text-gray-400 flex items-center gap-1">
+                <div class="text-xs opacity-80 flex items-center gap-1">
                   <.icon name="hero-map-pin" class="w-3 h-3" />
                   {@user_profile[:city] || @user_profile["city"]}
                 </div>
               </div>
             </div>
-            <div class="mt-2 text-xs text-purple-300">
+            <div class="mt-2 text-xs opacity-90">
               AI 비서: {@user_profile[:agent_name] || @user_profile["agent_name"]}
             </div>
           </div>
         <% end %>
 
-        <div class="p-4 border-b border-gray-700">
-          <button
-            phx-click="new_conversation"
-            class="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 rounded-lg transition"
-          >
-            + New Chat
+        <div class="p-4 border-b border-base-300">
+          <button phx-click="new_conversation" class="btn btn-primary btn-block gap-2">
+            <.icon name="hero-plus" class="w-4 h-4" /> New Chat
           </button>
         </div>
 
         <div class="flex-1 overflow-y-auto">
           <%= for conv <- @conversations do %>
-            <div class={"group flex items-center justify-between p-3 cursor-pointer hover:bg-gray-800 border-b border-gray-700 #{if @current_conversation && @current_conversation.id == conv.id, do: "bg-gray-700", else: ""}"}>
+            <div class={[
+              "group flex items-center justify-between p-3 cursor-pointer hover:bg-base-300 border-b border-base-300 transition-colors",
+              @current_conversation && @current_conversation.id == conv.id && "bg-base-300"
+            ]}>
               <div
                 phx-click="select_conversation"
                 phx-value-id={conv.id}
                 class="flex-1 min-w-0"
               >
-                <div class="truncate text-sm">{conv.title}</div>
-                <div class="text-xs text-gray-400">
+                <div class="truncate text-sm font-medium">{conv.title}</div>
+                <div class="text-xs text-base-content/50">
                   {Calendar.strftime(conv.inserted_at, "%Y-%m-%d %H:%M")}
                 </div>
               </div>
@@ -443,7 +447,7 @@ defmodule WebWeb.ChatLive do
                 phx-click="delete_conversation"
                 phx-value-id={conv.id}
                 data-confirm="이 대화를 삭제하시겠습니까? 모든 메시지가 함께 삭제됩니다."
-                class="ml-2 p-1 text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                class="btn btn-ghost btn-xs btn-circle text-error opacity-0 group-hover:opacity-100 transition-opacity"
                 title="대화 삭제"
               >
                 <.icon name="hero-trash" class="w-4 h-4" />
@@ -453,30 +457,29 @@ defmodule WebWeb.ChatLive do
         </div>
         
     <!-- MCP Panel -->
-        <div class="border-t border-gray-700 p-3">
-          <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+        <div class="border-t border-base-300 p-3">
+          <div class="text-xs font-semibold text-base-content/50 uppercase tracking-wider mb-2">
             사용 가능한 MCP
           </div>
           <%= if @available_mcps == [] do %>
-            <div class="text-xs text-gray-500 italic p-2">
+            <div class="text-xs text-base-content/40 italic p-2">
               설정된 MCP가 없습니다
             </div>
           <% else %>
             <div class="space-y-1">
               <%= for mcp <- @available_mcps do %>
-                <div class="flex items-center gap-2 p-2 rounded text-sm bg-gray-800 hover:bg-gray-700 transition">
-                  <span class="flex items-center justify-center w-5 h-5 bg-purple-600 text-white text-xs rounded">
+                <div class="flex items-center gap-2 p-2 rounded-lg text-sm bg-base-300 hover:bg-base-300/80 transition">
+                  <div class="badge badge-secondary badge-sm">
                     <.icon name="hero-server" class="w-3 h-3" />
-                  </span>
+                  </div>
                   <div class="flex-1 min-w-0">
-                    <div class="truncate font-medium text-purple-300">
+                    <div class="truncate font-medium text-secondary">
                       {mcp.name}
                     </div>
-                    <div class="truncate text-xs text-gray-400">
+                    <div class="truncate text-xs text-base-content/50">
                       {mcp.command} {Enum.join(mcp.args, " ")}
                     </div>
                   </div>
-                  <!-- 신호등 상태 표시 -->
                   <span
                     class={mcp_status_indicator_class(mcp.status)}
                     title={mcp_status_label(mcp.status)}
@@ -490,56 +493,55 @@ defmodule WebWeb.ChatLive do
         </div>
         
     <!-- Agent Panel -->
-        <div class="border-t border-gray-700 p-3">
-          <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+        <div class="border-t border-base-300 p-3">
+          <div class="text-xs font-semibold text-base-content/50 uppercase tracking-wider mb-2">
             사용 가능한 에이전트
           </div>
           <div class="space-y-1">
             <%= for agent <- @available_agents do %>
               <% usage_info = find_agent_usage(@agent_usage_history, agent.id) %>
-              <div class={"flex items-center gap-2 p-2 rounded text-sm #{if usage_info, do: "bg-gray-700", else: "bg-gray-800"}"}>
+              <div class={[
+                "flex items-center gap-2 p-2 rounded-lg text-sm transition",
+                (usage_info && "bg-primary/10 ring-1 ring-primary/30") || "bg-base-300"
+              ]}>
                 <%= if usage_info do %>
-                  <span class="flex items-center justify-center w-5 h-5 bg-blue-600 text-white text-xs font-bold rounded-full">
+                  <div class="badge badge-primary badge-sm font-bold">
                     {usage_info.order}
-                  </span>
+                  </div>
                 <% else %>
-                  <span class="flex items-center justify-center w-5 h-5 bg-gray-600 text-gray-400 text-xs rounded-full">
-                    -
-                  </span>
+                  <div class="badge badge-ghost badge-sm">-</div>
                 <% end %>
                 <div class="flex-1 min-w-0">
                   <div class="truncate font-medium">
                     {agent.display_name || agent.name}
                   </div>
                   <%= if agent.description do %>
-                    <div class="truncate text-xs text-gray-400">
+                    <div class="truncate text-xs text-base-content/50">
                       {agent.description}
                     </div>
                   <% end %>
                 </div>
                 <%= if usage_info do %>
-                  <span class="text-xs text-green-400" title="사용됨">
-                    <.icon name="hero-check-circle" class="w-4 h-4" />
-                  </span>
+                  <.icon name="hero-check-circle" class="w-4 h-4 text-success" />
                 <% end %>
               </div>
             <% end %>
           </div>
 
           <%= if @agent_usage_history != [] do %>
-            <div class="mt-3 pt-3 border-t border-gray-700">
-              <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+            <div class="mt-3 pt-3 border-t border-base-300">
+              <div class="text-xs font-semibold text-base-content/50 uppercase tracking-wider mb-2">
                 실행 순서
               </div>
               <div class="flex flex-wrap gap-1">
                 <%= for usage <- @agent_usage_history do %>
-                  <span
-                    class="inline-flex items-center gap-1 px-2 py-1 bg-blue-600/20 text-blue-300 text-xs rounded"
+                  <div
+                    class="badge badge-primary badge-sm gap-1"
                     title={Calendar.strftime(usage.timestamp, "%H:%M:%S")}
                   >
                     <span class="font-bold">{usage.order}.</span>
                     {usage.agent.display_name || usage.agent.name}
-                  </span>
+                  </div>
                 <% end %>
               </div>
             </div>
@@ -550,48 +552,58 @@ defmodule WebWeb.ChatLive do
     <!-- Main Chat Area -->
       <div class="flex-1 flex flex-col">
         <!-- Header -->
-        <div class="bg-white border-b p-4 shadow-sm">
-          <div class="flex items-center justify-between">
+        <div class="navbar bg-base-100 border-b border-base-300 shadow-sm px-4">
+          <div class="flex-1">
             <div>
-              <h1 class="text-xl font-semibold text-gray-800">
+              <h1 class="text-xl font-semibold">
                 {if @current_conversation,
                   do: @current_conversation.title,
                   else: "Agentic AI Assistant"}
               </h1>
-              <p class="text-sm text-gray-500">Powered by Azure OpenAI gpt-5-mini</p>
+              <p class="text-sm text-base-content/50">Powered by Azure OpenAI gpt-5-mini</p>
             </div>
+          </div>
+          <div class="flex-none">
             <%= if @current_conversation do %>
               <button
                 phx-click="delete_conversation"
                 phx-value-id={@current_conversation.id}
                 data-confirm="이 대화를 삭제하시겠습니까? 모든 메시지가 함께 삭제됩니다."
-                class="flex items-center gap-2 px-3 py-2 text-red-600 hover:text-red-700 hover:bg-red-50 border border-red-200 rounded-lg transition"
+                class="btn btn-ghost btn-sm text-error gap-2"
                 title="대화 삭제"
               >
-                <.icon name="hero-trash" class="w-4 h-4" />
-                <span class="text-sm">삭제</span>
+                <.icon name="hero-trash" class="w-4 h-4" /> 삭제
               </button>
             <% end %>
           </div>
         </div>
         
     <!-- Messages -->
-        <div class="flex-1 overflow-y-auto p-4 space-y-4" id="messages">
+        <div class="flex-1 overflow-y-auto p-4 space-y-2" id="messages">
           <%= if @messages == [] and @current_conversation do %>
-            <div class="text-center text-gray-500 mt-8">
-              <p class="text-lg">Start a conversation!</p>
-              <p class="text-sm">The assistant can help you with various tasks using tools.</p>
+            <div class="hero min-h-[50vh]">
+              <div class="hero-content text-center">
+                <div class="max-w-md">
+                  <h2 class="text-2xl font-bold">대화를 시작하세요!</h2>
+                  <p class="py-4 text-base-content/60">
+                    AI 어시스턴트가 다양한 도구를 활용하여 도움을 드릴 수 있습니다.
+                  </p>
+                </div>
+              </div>
             </div>
           <% end %>
 
           <%= for message <- @messages do %>
-            <div class={message_container_class(message.role)}>
-              <div class={message_bubble_class(message.role)}>
-                <div class="text-xs text-gray-500 mb-1">
-                  {role_label(message.role)}
-                </div>
+            <div class={[
+              "chat",
+              (message.role in [:user, "user"] && "chat-end") || "chat-start"
+            ]}>
+              <div class="chat-header text-xs opacity-60 mb-1">
+                {role_label(message.role)}
+              </div>
+              <div class={["chat-bubble", chat_bubble_class(message.role)]}>
                 <%= if message.role in [:assistant, "assistant"] do %>
-                  <div class="prose prose-sm max-w-none prose-headings:text-gray-800 prose-p:text-gray-700 prose-code:text-pink-600 prose-pre:bg-gray-800 prose-pre:text-gray-100 prose-a:text-blue-600 prose-strong:text-gray-900 prose-li:text-gray-700">
+                  <div class="prose prose-sm max-w-none">
                     {render_markdown(message.content)}
                   </div>
                 <% else %>
@@ -604,65 +616,47 @@ defmodule WebWeb.ChatLive do
           <%= if @loading do %>
             <%= if @streaming_content != "" or @streaming_status do %>
               <!-- 스트리밍 메시지 표시 -->
-              <div class="flex justify-start">
-                <div class="max-w-[70%] rounded-lg p-4 bg-gray-200 text-gray-800">
-                  <div class="text-xs text-gray-500 mb-1 flex items-center gap-2">
-                    Assistant
-                    <%= case @streaming_status do %>
-                      <% :streaming -> %>
-                        <span class="inline-flex items-center gap-1 text-blue-500">
-                          <span class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></span>
-                          실시간 응답 중...
-                        </span>
-                      <% {:tool_executing, tool_names} -> %>
-                        <span class="inline-flex items-center gap-1 text-orange-500">
-                          <.icon name="hero-cog-6-tooth" class="w-3 h-3 animate-spin" />
-                          도구 실행 중: {Enum.join(tool_names, ", ")}
-                        </span>
-                      <% :postprocessing -> %>
-                        <span class="inline-flex items-center gap-1 text-purple-500">
-                          <.icon name="hero-sparkles" class="w-3 h-3 animate-pulse" /> 응답 다듬는 중...
-                        </span>
-                      <% :finishing -> %>
-                        <span class="inline-flex items-center gap-1 text-green-500">
-                          <.icon name="hero-check-circle" class="w-3 h-3" /> 완료 중...
-                        </span>
-                      <% _ -> %>
-                        <span class="inline-flex items-center gap-1 text-gray-400">
-                          처리 중...
-                        </span>
-                    <% end %>
-                  </div>
+              <div class="chat chat-start">
+                <div class="chat-header text-xs opacity-60 mb-1 flex items-center gap-2">
+                  Assistant
+                  <%= case @streaming_status do %>
+                    <% :streaming -> %>
+                      <span class="badge badge-info badge-sm gap-1">
+                        <span class="loading loading-dots loading-xs"></span> 실시간 응답 중
+                      </span>
+                    <% {:tool_executing, tool_names} -> %>
+                      <span class="badge badge-warning badge-sm gap-1">
+                        <span class="loading loading-spinner loading-xs"></span>
+                        {Enum.join(tool_names, ", ")}
+                      </span>
+                    <% :postprocessing -> %>
+                      <span class="badge badge-secondary badge-sm gap-1">
+                        <.icon name="hero-sparkles" class="w-3 h-3 animate-pulse" /> 응답 다듬는 중
+                      </span>
+                    <% :finishing -> %>
+                      <span class="badge badge-success badge-sm gap-1">
+                        <.icon name="hero-check-circle" class="w-3 h-3" /> 완료 중
+                      </span>
+                    <% _ -> %>
+                      <span class="badge badge-ghost badge-sm">처리 중</span>
+                  <% end %>
+                </div>
+                <div class="chat-bubble chat-bubble-accent">
                   <%= if @streaming_content != "" do %>
-                    <div class="prose prose-sm max-w-none prose-headings:text-gray-800 prose-p:text-gray-700 prose-code:text-pink-600 prose-pre:bg-gray-800 prose-pre:text-gray-100 prose-a:text-blue-600 prose-strong:text-gray-900 prose-li:text-gray-700">
+                    <div class="prose prose-sm max-w-none">
                       {render_markdown(@streaming_content)}
                     </div>
-                    <!-- 커서 애니메이션 -->
-                    <span class="inline-block w-2 h-4 bg-blue-500 animate-pulse ml-1"></span>
+                    <span class="inline-block w-2 h-4 bg-primary animate-pulse ml-1"></span>
                   <% else %>
-                    <div class="flex items-center space-x-2">
-                      <div class="animate-pulse flex space-x-1">
-                        <div class="w-2 h-2 bg-gray-500 rounded-full"></div>
-                        <div class="w-2 h-2 bg-gray-500 rounded-full"></div>
-                        <div class="w-2 h-2 bg-gray-500 rounded-full"></div>
-                      </div>
-                      <span class="text-sm text-gray-500">준비 중...</span>
-                    </div>
+                    <span class="loading loading-dots loading-md"></span>
                   <% end %>
                 </div>
               </div>
             <% else %>
               <!-- 기존 로딩 표시 -->
-              <div class="flex justify-start">
-                <div class="bg-gray-200 rounded-lg p-4">
-                  <div class="flex items-center space-x-2">
-                    <div class="animate-pulse flex space-x-1">
-                      <div class="w-2 h-2 bg-gray-500 rounded-full"></div>
-                      <div class="w-2 h-2 bg-gray-500 rounded-full"></div>
-                      <div class="w-2 h-2 bg-gray-500 rounded-full"></div>
-                    </div>
-                    <span class="text-sm text-gray-500">Thinking...</span>
-                  </div>
+              <div class="chat chat-start">
+                <div class="chat-bubble chat-bubble-accent">
+                  <span class="loading loading-dots loading-md"></span>
                 </div>
               </div>
             <% end %>
@@ -671,29 +665,32 @@ defmodule WebWeb.ChatLive do
         
     <!-- Input -->
         <%= if @current_conversation do %>
-          <div class="bg-white border-t p-4">
-            <form phx-submit="send_message" phx-change="update_input" class="flex space-x-4">
+          <div class="bg-base-100 border-t border-base-300 p-4">
+            <form phx-submit="send_message" phx-change="update_input" class="join w-full">
               <input
                 type="text"
                 name="message"
                 value={@input}
-                placeholder="Type your message..."
+                placeholder="메시지를 입력하세요..."
                 disabled={@loading}
-                class="flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                class="input input-bordered join-item flex-1"
                 autocomplete="off"
               />
               <button
                 type="submit"
                 disabled={@loading or @input == ""}
-                class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-6 py-2 rounded-lg transition"
+                class="btn btn-primary join-item gap-2"
               >
-                Send
+                <.icon name="hero-paper-airplane" class="w-5 h-5" /> Send
               </button>
             </form>
           </div>
         <% else %>
-          <div class="bg-white border-t p-4 text-center text-gray-500">
-            Select a conversation or create a new one to start chatting.
+          <div class="bg-base-100 border-t border-base-300 p-4">
+            <div class="alert alert-info">
+              <.icon name="hero-information-circle" class="w-5 h-5" />
+              <span>대화를 선택하거나 새로 만들어 채팅을 시작하세요.</span>
+            </div>
           </div>
         <% end %>
       </div>
@@ -701,19 +698,13 @@ defmodule WebWeb.ChatLive do
     """
   end
 
-  defp message_container_class(role) when role in [:user, "user"], do: "flex justify-end"
-  defp message_container_class(_), do: "flex justify-start"
+  defp chat_bubble_class(role) when role in [:user, "user"], do: "chat-bubble-primary"
+  defp chat_bubble_class(role) when role in [:assistant, "assistant"], do: "chat-bubble-accent"
 
-  defp message_bubble_class(role) when role in [:user, "user"],
-    do: "max-w-[70%] rounded-lg p-4 bg-blue-600 text-white"
+  defp chat_bubble_class(role) when role in [:tool, "tool"],
+    do: "chat-bubble-warning"
 
-  defp message_bubble_class(role) when role in [:assistant, "assistant"],
-    do: "max-w-[70%] rounded-lg p-4 bg-gray-200 text-gray-800"
-
-  defp message_bubble_class(role) when role in [:tool, "tool"],
-    do: "max-w-[70%] rounded-lg p-4 bg-yellow-100 text-gray-800 border border-yellow-300"
-
-  defp message_bubble_class(_), do: "max-w-[70%] rounded-lg p-4 bg-gray-100 text-gray-800"
+  defp chat_bubble_class(_), do: ""
 
   defp role_label(role) when role in [:user, "user"], do: "You"
   defp role_label(role) when role in [:assistant, "assistant"], do: "Assistant"
@@ -742,10 +733,10 @@ defmodule WebWeb.ChatLive do
     base = "flex items-center justify-center w-5 h-5 rounded-full"
 
     case status do
-      :ready -> "#{base} bg-green-500/20"
-      :unavailable -> "#{base} bg-red-500/20"
-      :unknown -> "#{base} bg-gray-500/20"
-      _ -> "#{base} bg-gray-500/20"
+      :ready -> "#{base} bg-success/20"
+      :unavailable -> "#{base} bg-error/20"
+      :unknown -> "#{base} bg-base-content/10"
+      _ -> "#{base} bg-base-content/10"
     end
   end
 
@@ -753,10 +744,10 @@ defmodule WebWeb.ChatLive do
     base = "w-2.5 h-2.5 rounded-full"
 
     case status do
-      :ready -> "#{base} bg-green-500 shadow-lg shadow-green-500/50"
-      :unavailable -> "#{base} bg-red-500 shadow-lg shadow-red-500/50"
-      :unknown -> "#{base} bg-gray-500"
-      _ -> "#{base} bg-gray-500"
+      :ready -> "#{base} bg-success shadow-lg shadow-success/50"
+      :unavailable -> "#{base} bg-error shadow-lg shadow-error/50"
+      :unknown -> "#{base} bg-base-content/30"
+      _ -> "#{base} bg-base-content/30"
     end
   end
 
